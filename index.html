@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regenerative Braking Interactive Engineering Simulator</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Local Three.js with CDN fallback -->
+    <script src="libs/three.min.js"></script>
+    <script>
+        if (typeof THREE === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+        }
+    </script>
+    <script src="libs/OrbitControls.js"></script>
+    <script>
+        if (typeof THREE.OrbitControls === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+        }
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <div>
+                    <h1 class="brand-title">Regenerative Braking Simulator</h1>
+                    <div class="brand-subtitle">EV Longitudinal Dynamics &amp; Energy Recovery Sandbox</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button id="btn-xray" class="btn active" title="Toggle Translucent Chassis X-Ray">🔬 X-Ray Chassis</button>
+                <button id="btn-audio" class="btn" title="Toggle Synthesized Motor &amp; Inverter Sound">🔇 Audio Muted</button>
+                <button id="btn-pause" class="btn" title="Pause / Resume Simulation">⏸ Pause</button>
+                <button id="btn-reset" class="btn" title="Reset Vehicle to Baseline">🔄 Reset</button>
+            </div>
+        </header>
+
+        <!-- LEFT SIDEBAR: PARAMETERS & SCENARIOS -->
+        <aside class="sidebar-left">
+            <!-- Section 1: Vehicle Configuration -->
+            <div class="panel-section">
+                <div class="section-title">
+                    <span>Vehicle Parameters</span>
+                    <span style="font-size: 10px; color: var(--text-muted);">BASELINE</span>
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Vehicle Mass</span>
+                        <span id="param-mass-val" class="control-val">1600 kg</span>
+                    </div>
+                    <input type="range" id="param-mass" min="1000" max="2800" step="50" value="1600">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Peak Regen Power</span>
+                        <span id="param-gen-power-val" class="control-val">100 kW</span>
+                    </div>
+                    <input type="range" id="param-gen-power" min="40" max="220" step="5" value="100">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Battery Initial SoC</span>
+                        <span id="param-soc-val" class="control-val">80%</span>
+                    </div>
+                    <input type="range" id="param-soc" min="10" max="100" step="1" value="80">
+                </div>
+            </div>
+
+            <!-- Section 2: Control Strategy -->
+            <div class="panel-section">
+                <div class="section-title">Braking Control Strategy</div>
+                <div class="control-group">
+                    <select id="param-blending">
+                        <option value="series" selected>Series Blending (Decoupled / Max Regen)</option>
+                        <option value="parallel">Parallel Blending (Fixed Hydraulic Split)</option>
+                        <option value="one-pedal">One-Pedal Drive Mode</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section 3: Environment & Road -->
+            <div class="panel-section">
+                <div class="section-title">Environment &amp; Road</div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Road Grade</span>
+                        <span id="param-grade-val" class="control-val">0%</span>
+                    </div>
+                    <input type="range" id="param-grade" min="-15" max="15" step="1" value="0">
+                </div>
+                <div class="control-group">
+                    <div class="control-label">
+                        <span>Surface Friction (μ)</span>
+                    </div>
+                    <select id="param-friction">
+                        <option value="0.90" selected>Dry Asphalt (μ = 0.90)</option>
+                        <option value="0.45">Wet Asphalt (μ = 0.45 - ABS active)</option>
+                        <option value="0.20">Snow / Ice (μ = 0.20 - Low adhesion)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Section 4: Simulation Scenarios -->
+            <div class="panel-section">
+                <div class="section-title">Drive Cycle Presets</div>
+                <button class="btn btn-scenario" data-scenario="emergency_stop">🛑 Emergency Stop (100 → 0 km/h)</button>
+                <button class="btn btn-scenario" data-scenario="highway_decel">🛣️ Highway Decel (120 → 50 km/h)</button>
+                <button class="btn btn-scenario" data-scenario="mountain_descent">⛰️ Mountain Descent (-8% Grade)</button>
+                <button class="btn btn-scenario" data-scenario="high_soc_taper">⚡ High SoC Taper Test (98.5%)</button>
+                <button class="btn btn-scenario" data-scenario="wet_road_abs">🌧️ Wet Road ABS Slip Test</button>
+                <button class="btn btn-scenario" data-scenario="wltp_cycle">🔄 WLTP Urban Drive Cycle</button>
+            </div>
+
+            <!-- Section 5: Fault Injection -->
+            <div class="panel-section">
+                <div class="section-title">Fault Injection Sandbox</div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="btn-fault-overheat" class="btn" style="flex: 1; font-size: 11px;">🔥 Inverter Overheat</button>
+                    <button id="btn-fault-invtrip" class="btn" style="flex: 1; font-size: 11px;">⚠️ Inverter Trip</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER: 3D VIEWPORT & COCKPIT CONTROLS -->
+        <main class="viewport-center">
+            <div id="viewport-3d"></div>
+
+            <!-- Camera View Presets -->
+            <div class="hud-camera-bar">
+                <button class="btn-cam-view active" data-view="orbit" title="Orbit Camera [Key 1]">360° Orbit</button>
+                <button class="btn-cam-view" data-view="xray_motor" title="Focus Motor &amp; Inverter [Key 2]">Motor &amp; Inverter</button>
+                <button class="btn-cam-view" data-view="brake_wheel" title="Focus Brake Disc Glow [Key 3]">Brake Disc Glow</button>
+                <button class="btn-cam-view" data-view="chase" title="Chase Camera [Key 4]">Chase View</button>
+                <button class="btn-cam-view" data-view="top" title="Top Down Energy Flow [Key 5]">Top-Down</button>
+            </div>
+
+            <!-- Dynamic Scenario Status Banner -->
+            <div id="hud-scenario-banner" class="hud-scenario-banner" style="display: none;">
+                <span>⚡</span>
+                <span id="scenario-banner-text">Running Scenario...</span>
+                <button id="btn-cancel-scenario" class="btn-scenario-cancel">✕ Abort</button>
+            </div>
+
+            <!-- Digital Speedometer HUD -->
+            <div class="hud-speedometer">
+                <div class="speed-readout">
+                    <span id="val-speed" class="speed-num">0.0</span>
+                    <span id="unit-speed" class="speed-unit">KM/H</span>
+                </div>
+                <div class="accel-readout">
+                    <span>Decel: </span><span id="val-accel">0.00 g</span>
+                </div>
+                <div class="status-badges">
+                    <span id="badge-power-state" class="badge badge-muted">IDLE</span>
+                    <span id="badge-abs" class="badge badge-amber" style="display: none;">ABS ENGAGED</span>
+                    <span id="badge-taper" class="badge badge-blue" style="display: none;">SOC TAPER</span>
+                    <span id="badge-inv-fault" class="badge badge-red" style="display: none;">INV TRIP</span>
+                </div>
+            </div>
+
+            <!-- Interactive Pedals (Mouse/Touch Drag & Keyboard Support) -->
+            <div class="hud-pedals">
+                <!-- Brake Pedal -->
+                <div class="pedal-box">
+                    <div class="pedal-label">Brake</div>
+                    <div id="pedal-brake" class="pedal-plate pedal-brake">
+                        <div class="pedal-fill"></div>
+                        <div class="pedal-stripes">
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                        </div>
+                    </div>
+                    <div id="brake-val-display" class="pedal-val-label">0%</div>
+                </div>
+
+                <!-- Accelerator Pedal -->
+                <div class="pedal-box">
+                    <div class="pedal-label">Throttle</div>
+                    <div id="pedal-throttle" class="pedal-plate pedal-throttle">
+                        <div class="pedal-fill"></div>
+                        <div class="pedal-stripes">
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                            <div class="pedal-stripe"></div>
+                        </div>
+                    </div>
+                    <div id="throttle-val-display" class="pedal-val-label">0%</div>
+                </div>
+            </div>
+
+            <!-- Keyboard Guide Tooltip -->
+            <div style="position: absolute; bottom: 12px; left: 24px; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); pointer-events: none;">
+                [W/↑] Gas &nbsp;|&nbsp; [S/↓] Brake &nbsp;|&nbsp; [Space] E-Brake &nbsp;|&nbsp; [X] X-Ray &nbsp;|&nbsp; [M] Audio &nbsp;|&nbsp; [1-5] Cameras
+            </div>
+        </main>
+
+        <!-- RIGHT SIDEBAR: POWER & TELEMETRY -->
+        <aside class="sidebar-right">
+            <!-- Card 1: Power Meter & Flow -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Power Flow</span>
+                    <span id="val-power" class="metric-main-val text-muted">0.0 kW</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="bar-power-fill" class="bar-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Card 2: Torque Blending Split -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Torque Blending Split</span>
+                </div>
+                <div class="blending-bar-container">
+                    <div id="bar-regen-split" class="bar-regen" style="width: 0%;"></div>
+                    <div id="bar-friction-split" class="bar-friction" style="width: 0%;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+                    <span class="text-green">⚡ Regen: <strong id="val-regen-torque">0 Nm</strong> (<span id="pct-regen-split">0%</span>)</span>
+                    <span class="text-red">🛑 Friction: <strong id="val-friction-torque">0 Nm</strong> (<span id="pct-friction-split">0%</span>)</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Energy Recovery Benchmark -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Energy Recovery Benchmark</span>
+                </div>
+                <div class="metric-grid">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Recovered:</span>
+                        <span id="val-energy-recovered" class="telemetry-val text-green">0.00 Wh</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Efficiency:</span>
+                        <span id="val-energy-efficiency" class="telemetry-val text-cyan">0.0%</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Stop Dist:</span>
+                        <span id="val-stopping-dist" class="telemetry-val">0.0 m</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Stop Time:</span>
+                        <span id="val-stopping-time" class="telemetry-val">0.00 s</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 4: Battery Telemetry -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>High-Voltage Battery Pack</span>
+                    <span id="val-soc" class="control-val text-green">80.0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="bar-soc-fill" class="bar-fill bar-green" style="width: 80%;"></div>
+                </div>
+                <div class="metric-grid" style="margin-top: 6px;">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Terminal V:</span>
+                        <span id="val-voltage" class="telemetry-val">400.0 V</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Current:</span>
+                        <span id="val-current" class="telemetry-val">0.0 A</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Battery Temp:</span>
+                        <span id="val-bat-temp" class="telemetry-val">28°C</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Chemistry:</span>
+                        <span class="telemetry-val">NMC Li-ion</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 5: Electric Motor & Inverter -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Electric Drive Unit</span>
+                </div>
+                <div class="metric-grid">
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Motor RPM:</span>
+                        <span id="val-motor-rpm" class="telemetry-val">0 RPM</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Back-EMF:</span>
+                        <span id="val-back-emf" class="telemetry-val">0.0 V</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Motor Temp:</span>
+                        <span id="val-motor-temp" class="telemetry-val">40°C</span>
+                    </div>
+                    <div class="telemetry-row">
+                        <span class="telemetry-label">Inverter Temp:</span>
+                        <span id="val-inverter-temp" class="telemetry-val">45°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 6: Friction Brakes & Thermal Glow -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <span>Brake Disc Temperature</span>
+                    <span id="val-disc-temp" class="telemetry-val">35°C</span>
+                </div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">
+                    Disc glows red &gt; 250°C under heavy mechanical friction deceleration.
+                </div>
+            </div>
+        </aside>
+
+        <!-- FOOTER: REAL-TIME OSCILLOSCOPE STRIP CHARTS -->
+        <footer class="footer-oscilloscope">
+            <div class="chart-header">
+                <span>Multi-Channel Telemetry Oscilloscope</span>
+                <span style="font-size: 10px; color: var(--text-muted);">SAMPLING RATE: 60 HZ REAL-TIME</span>
+            </div>
+            <div class="chart-canvas-wrapper">
+                <canvas id="telemetry-canvas"></canvas>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/physics.js"></script>
+    <script src="js/scene3d.js"></script>
+    <script src="js/telemetry.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
