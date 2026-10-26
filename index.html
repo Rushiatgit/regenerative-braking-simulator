@@ -4,18 +4,630 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regenerative Braking Interactive Engineering Simulator</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <!-- Local Three.js with CDN fallback -->
-    <script src="libs/three.min.js"></script>
+    <!-- Embedded High-Tech Automotive Styles -->
+    <style>
+/* styles.css - High-Tech Automotive Engineering Simulator Theme */
+
+:root {
+    --bg-primary: #0a0d14;
+    --bg-secondary: #0f172a;
+    --bg-panel: rgba(15, 23, 42, 0.75);
+    --border-color: rgba(56, 189, 248, 0.2);
+    --border-highlight: #38bdf8;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #38bdf8;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-amber: #f59e0b;
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    user-select: none;
+}
+
+/* App Container Layout */
+.app-container {
+    display: grid;
+    grid-template-rows: 56px 1fr 220px;
+    grid-template-columns: 320px 1fr 340px;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-primary);
+}
+
+/* Header */
+.app-header {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 10;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #000;
+    font-size: 14px;
+}
+
+.brand-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.brand-subtitle {
+    font-size: 11px;
+    color: var(--accent-blue);
+    font-family: var(--font-mono);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Buttons */
+.btn {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: var(--accent-blue);
+    color: #fff;
+}
+
+.btn.active {
+    background: var(--accent-blue);
+    color: #000;
+    border-color: var(--accent-blue);
+}
+
+.btn-green.active {
+    background: var(--accent-green);
+    color: #000;
+    border-color: var(--accent-green);
+}
+
+/* Left Sidebar - Engineering Parameter Tuning */
+.sidebar-left {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    z-index: 5;
+}
+
+.panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.section-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.15);
+    padding-bottom: 4px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.control-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.control-val {
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+input[type="range"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: #1e293b;
+    border-radius: 3px;
+    outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: var(--accent-cyan);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+select {
+    background: #1e293b;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+}
+
+/* Center 3D Viewport */
+.viewport-center {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at center, #111827 0%, #0a0d14 100%);
+}
+
+#viewport-3d {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Floating Cockpit HUD Overlays */
+.hud-camera-bar {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 4px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    z-index: 5;
+}
+
+.btn-cam-view {
+    padding: 4px 10px;
+    font-size: 11px;
+    border-radius: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-cam-view:hover {
+    color: var(--text-primary);
+}
+
+.btn-cam-view.active {
+    background: var(--accent-cyan);
+    color: #000;
+}
+
+/* Scenario Banner */
+.hud-scenario-banner {
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--accent-cyan);
+    box-shadow: 0 0 16px rgba(6, 182, 212, 0.35);
+    padding: 8px 18px;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 10;
+}
+
+.btn-scenario-cancel {
+    background: rgba(239, 68, 68, 0.25);
+    border: 1px solid var(--accent-red);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-scenario-cancel:hover {
+    background: var(--accent-red);
+}
+
+.btn-scenario.active {
+    background: rgba(6, 182, 212, 0.25) !important;
+    border-color: var(--accent-cyan) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+.btn-fault-active {
+    background: rgba(239, 68, 68, 0.3) !important;
+    border-color: var(--accent-red) !important;
+    color: #fff !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* On-Screen Interactive Pedals */
+.hud-pedals {
+    position: absolute;
+    bottom: 20px;
+    right: 30px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-end;
+    z-index: 5;
+}
+
+.pedal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.pedal-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.pedal-val-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.pedal-plate {
+    width: 65px;
+    height: 110px;
+    background: #1e293b;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.4);
+    touch-action: none;
+}
+
+.pedal-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--press-height, 0%);
+    transition: height 0.05s ease-out;
+    pointer-events: none;
+}
+
+.pedal-brake .pedal-fill {
+    background: linear-gradient(to top, rgba(239, 68, 68, 0.8), rgba(245, 158, 11, 0.6));
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+.pedal-throttle .pedal-fill {
+    background: linear-gradient(to top, rgba(56, 189, 248, 0.8), rgba(6, 182, 212, 0.6));
+    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+}
+
+.pedal-stripes {
+    position: absolute;
+    inset: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    pointer-events: none;
+}
+
+.pedal-stripe {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+}
+
+/* Primary Speed & Status Overlay */
+.hud-speedometer {
+    position: absolute;
+    top: 20px;
+    left: 24px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 5;
+}
+
+.speed-readout {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.speed-num {
+    font-family: var(--font-mono);
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+}
+
+.speed-unit {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.accel-readout {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent-cyan);
+}
+
+.status-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.badge {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.badge-green { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+.badge-blue { background: rgba(56, 189, 248, 0.2); color: var(--accent-blue); border: 1px solid var(--accent-blue); }
+.badge-red { background: rgba(239, 68, 68, 0.25); color: var(--accent-red); border: 1px solid var(--accent-red); }
+.badge-amber { background: rgba(245, 158, 11, 0.2); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+.badge-muted { background: rgba(100, 116, 139, 0.2); color: var(--text-muted); }
+
+/* Right Sidebar - Power & Component Telemetry */
+.sidebar-right {
+    background: var(--bg-panel);
+    backdrop-filter: blur(12px);
+    border-left: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    z-index: 5;
+}
+
+/* Metric Cards */
+.metric-card {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(56, 189, 248, 0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.metric-main-val {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.telemetry-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+}
+
+.telemetry-label { color: var(--text-muted); }
+.telemetry-val { font-family: var(--font-mono); color: var(--text-primary); font-weight: 600; }
+
+.text-green { color: var(--accent-green) !important; }
+.text-blue { color: var(--accent-blue) !important; }
+.text-red { color: var(--accent-red) !important; }
+.text-amber { color: var(--accent-amber) !important; }
+.glow-red { text-shadow: 0 0 8px rgba(239, 68, 68, 0.8); }
+
+/* Stacked Torque Blending Bar */
+.blending-bar-container {
+    height: 12px;
+    background: #1e293b;
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    margin-top: 4px;
+}
+
+.bar-regen {
+    background: var(--accent-green);
+    height: 100%;
+    transition: width 0.08s ease;
+    box-shadow: 0 0 6px var(--accent-green);
+}
+
+.bar-friction {
+    background: var(--accent-red);
+    height: 100%;
+    transition: width 0.08s ease;
+    box-shadow: 0 0 6px var(--accent-red);
+}
+
+/* Progress bar generic */
+.progress-bar-bg {
+    height: 6px;
+    background: #1e293b;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 0.08s ease;
+}
+
+.bar-green { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+.bar-blue { background: var(--accent-blue); box-shadow: 0 0 8px var(--accent-blue); }
+
+/* Bottom Strip Chart Panel */
+.footer-oscilloscope {
+    grid-column: 1 / -1;
+    background: #0f172a;
+    border-top: 1px solid var(--border-color);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-header {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: rgba(30, 41, 59, 0.6);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.chart-canvas-wrapper {
+    flex: 1;
+    width: 100%;
+    position: relative;
+}
+
+#telemetry-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.5);
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+    </style>
+    <!-- Three.js 3D Engine & OrbitControls (CDN with local fallback) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         if (typeof THREE === 'undefined') {
-            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+            document.write('<script src="libs/three.min.js"><\/script>');
         }
     </script>
-    <script src="libs/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <script>
-        if (typeof THREE.OrbitControls === 'undefined') {
-            document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"><\/script>');
+        if (typeof THREE !== 'undefined' && typeof THREE.OrbitControls === 'undefined') {
+            document.write('<script src="libs/OrbitControls.js"><\/script>');
         }
     </script>
 </head>
@@ -331,11 +943,2245 @@
         </footer>
     </div>
 
-    <!-- Scripts -->
-    <script src="js/physics.js"></script>
-    <script src="js/scene3d.js"></script>
-    <script src="js/telemetry.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/main.js"></script>
+    <!-- Embedded Application Scripts -->
+    <script>
+    // --- 1. VEHICLE PHYSICS ENGINE ---
+/**
+ * physics.js - Longitudinal Vehicle Dynamics, PMSM Motor/Generator,
+ * Li-Ion Battery Equivalent Circuit, Torque Blending & Thermal Engine
+ */
+
+class VehiclePhysics {
+    constructor(config = {}) {
+        this.reset(config);
+    }
+
+    reset(config = {}) {
+        // Vehicle Specifications
+        this.mass = config.mass || 1600; // kg
+        this.weightDistFront = config.weightDistFront || 0.50; // 50/50 static
+        this.tireRadius = config.tireRadius || 0.32; // m (effective dynamic radius)
+        this.gearRatio = config.gearRatio || 9.0; // single-speed reduction
+        this.drivetrainEfficiency = 0.96;
+        this.frontalArea = 2.22; // m^2
+        this.cd = 0.28; // drag coefficient
+        this.crr = 0.012; // rolling resistance coefficient
+        this.rhoAir = 1.225; // kg/m^3
+        this.gravity = 9.81; // m/s^2
+
+        // Electric Motor / Generator (PMSM default)
+        this.motorType = config.motorType || 'PMSM'; // PMSM, Induction, BLDC
+        this.peakGenPower = config.peakGenPower || 100000; // Watts (100 kW)
+        this.peakDrivePower = config.peakDrivePower || 150000; // Watts (150 kW)
+        this.maxMotorTorque = config.maxMotorTorque || 320; // Nm
+        this.baseSpeedRpm = 4500; // RPM where field weakening starts
+        this.maxMotorRpm = 14000; // RPM mechanical limit
+        this.motorEfficiency = 0.94; // nominal motor efficiency
+        this.motorTemp = 40.0; // °C
+
+        // Power Electronics (Inverter)
+        this.inverterEfficiency = 0.97;
+        this.inverterTemp = 45.0; // °C
+        this.inverterOverheat = false;
+        this.inverterFault = false;
+
+        // Battery Pack (Li-Ion)
+        this.batteryCapacityKWh = config.batteryCapacityKWh || 64.0; // kWh
+        this.batteryCapacityAh = (this.batteryCapacityKWh * 1000) / 400.0; // Ah at 400V
+        this.batteryNominalVoltage = 400.0; // V
+        this.soc = config.initialSoc !== undefined ? config.initialSoc : 80.0; // % (0 - 100)
+        this.internalResistance = 0.045; // Ohms
+        this.batteryTemp = 28.0; // °C
+        this.maxChargeCRate = 2.5; // Max 2.5C regen charge
+        this.terminalVoltage = 400.0; // V
+        this.batteryCurrent = 0.0; // Amperes (negative = charging)
+
+        // Control & Blending Strategy
+        this.blendingStrategy = config.blendingStrategy || 'series'; // 'series', 'parallel', 'one-pedal'
+        this.onePedalAggression = 0.7; // 0 to 1
+
+        // Environment & Surface
+        this.roadGrade = config.roadGrade || 0.0; // % (-15% to +15%)
+        this.surfaceFriction = config.surfaceFriction || 0.90; // Dry=0.9, Wet=0.5, Ice=0.2
+
+        // Kinematics & States
+        this.speed = config.initialSpeed || 0.0; // m/s
+        this.distance = 0.0; // m
+        this.acceleration = 0.0; // m/s^2
+        this.motorRpm = 0.0;
+        this.wheelRpm = 0.0;
+        this.backEmf = 0.0; // Volts
+        this.pitchAngle = 0.0; // degrees (dive on braking)
+
+        // Torques & Powers
+        this.driverThrottle = 0.0; // 0.0 to 1.0
+        this.driverBrake = 0.0; // 0.0 to 1.0
+        this.regenTorque = 0.0; // Nm at motor shaft
+        this.frictionTorque = 0.0; // Nm equivalent at motor shaft
+        this.totalBrakingForce = 0.0; // N at wheels
+        this.regenPower = 0.0; // Watts (to DC bus)
+        this.drivePower = 0.0; // Watts
+        this.frictionPower = 0.0; // Watts dissipated as heat
+
+        // Thermal States for Brakes
+        this.frontBrakeDiscTemp = 35.0; // °C
+        this.rearBrakeDiscTemp = 35.0; // °C
+
+        // Cumulative Statistics
+        this.totalKineticEnergyLost = 0.0; // Joules
+        this.totalEnergyRecovered = 0.0; // Joules
+        this.totalEnergyExpended = 0.0; // Joules
+        this.totalFrictionHeatDissipated = 0.0; // Joules
+        this.brakingEventActive = false;
+        this.eventInitialSpeed = 0.0;
+        this.eventInitialDistance = 0.0;
+        this.eventKineticEnergyStart = 0.0;
+        this.eventRecoveredEnergy = 0.0;
+        this.eventStoppingDistance = 0.0;
+        this.eventStoppingTime = 0.0;
+
+        // ABS Status
+        this.absEngaged = false;
+        this.slipRatio = 0.0;
+    }
+
+    setInputs(throttle, brake) {
+        this.driverThrottle = Math.max(0, Math.min(1, throttle));
+        this.driverBrake = Math.max(0, Math.min(1, brake));
+    }
+
+    update(dt) {
+        if (dt <= 0 || dt > 0.1) dt = 0.016; // guard against huge steps
+
+        // 1. Wheel & Motor Kinematics
+        const wheelAngularVel = this.speed / this.tireRadius; // rad/s
+        this.wheelRpm = (wheelAngularVel * 60) / (2 * Math.PI);
+        const motorAngularVel = wheelAngularVel * this.gearRatio;
+        this.motorRpm = (motorAngularVel * 60) / (2 * Math.PI);
+
+        // Motor Back-EMF generation: E = k_e * omega_m
+        // At 14000 RPM, approx 420V back-EMF
+        const ke = 400.0 / ((10000 * 2 * Math.PI) / 60);
+        this.backEmf = ke * motorAngularVel;
+
+        // 2. Road & Aerodynamic Resistances
+        const gradeRad = Math.atan(this.roadGrade / 100.0);
+        const fAero = 0.5 * this.rhoAir * this.cd * this.frontalArea * Math.pow(this.speed, 2);
+        const fRoll = this.speed > 0.01 ? (this.crr * this.mass * this.gravity * Math.cos(gradeRad)) : 0;
+        const fGrade = this.mass * this.gravity * Math.sin(gradeRad);
+
+        // 3. Driver Demand Calculation
+        let demandedDriveTorque = 0;
+        let demandedBrakingTorque = 0; // equivalent torque at motor shaft
+
+        if (this.blendingStrategy === 'one-pedal') {
+            // One-pedal driving logic:
+            // Throttle > 0.2: acceleration
+            // Throttle 0.15 - 0.20: coasting deadband
+            // Throttle < 0.15: regenerative braking up to onePedalAggression
+            if (this.driverThrottle > 0.20) {
+                const normThrottle = (this.driverThrottle - 0.20) / 0.80;
+                demandedDriveTorque = normThrottle * this.maxMotorTorque;
+            } else if (this.driverThrottle < 0.15) {
+                const liftOffRegen = (0.15 - this.driverThrottle) / 0.15;
+                demandedBrakingTorque = liftOffRegen * this.maxMotorTorque * this.onePedalAggression;
+            }
+            // Additional brake pedal always adds on top
+            if (this.driverBrake > 0.01) {
+                demandedBrakingTorque += this.driverBrake * (this.maxMotorTorque * 2.5);
+            }
+        } else {
+            // Standard two-pedal driving
+            demandedDriveTorque = this.driverThrottle * this.maxMotorTorque;
+            // Max braking torque equivalent at motor shaft (capable of > 0.9g decel)
+            const maxVehicleBrakingForce = this.mass * this.gravity * 1.0; // 1g max
+            const maxMotorEquivalentBrakeTorque = (maxVehicleBrakingForce * this.tireRadius) / (this.gearRatio * this.drivetrainEfficiency);
+            demandedBrakingTorque = this.driverBrake * maxMotorEquivalentBrakeTorque;
+        }
+
+        // 4. Battery State & Inverter Constraints on Regeneration
+        // Open-circuit voltage as function of SoC
+        const socFrac = Math.max(0, Math.min(1, this.soc / 100.0));
+        // Lithium-ion typical OCV curve (approx 3.2V to 4.2V per cell, ~340V to 425V for 96S pack)
+        const packOcv = 340.0 + 70.0 * Math.pow(socFrac, 0.4) + 15.0 * Math.pow(socFrac, 3.0);
+
+        // Battery Charging Power Limit (C-rate and high SoC protection)
+        let maxBatteryChargePower = (this.batteryCapacityKWh * 1000) * this.maxChargeCRate; // e.g. 160 kW
+
+        // High SoC Tapering: Protect cells from lithium plating & overvoltage
+        let socTaperFactor = 1.0;
+        if (this.soc >= 98.0) {
+            socTaperFactor = 0.0; // 100% cutoff at 98%+
+        } else if (this.soc > 80.0) {
+            // Smooth cubic taper from 1.0 at 80% to 0.0 at 98%
+            const t = (this.soc - 80.0) / 18.0;
+            socTaperFactor = Math.cos(t * Math.PI * 0.5);
+        }
+        maxBatteryChargePower *= socTaperFactor;
+
+        // Inverter / Motor Thermal Derating
+        let thermalDerate = 1.0;
+        if (this.inverterOverheat) {
+            this.inverterTemp = 86.0; // latch to 86°C
+            thermalDerate *= 0.25; // 75% power cut due to overheat protection
+        } else if (this.inverterTemp > 75.0) {
+            thermalDerate *= Math.max(0.1, 1.0 - (this.inverterTemp - 75.0) / 25.0);
+        }
+        if (this.motorTemp > 100.0) {
+            thermalDerate *= Math.max(0.1, 1.0 - (this.motorTemp - 100.0) / 30.0);
+        }
+        if (this.inverterFault) {
+            thermalDerate = 0.0; // complete inverter shutdown
+        }
+
+        // Low Speed Cutoff: Below 5 km/h (1.38 m/s), back-EMF is too low and motor field decays
+        let lowSpeedFactor = 1.0;
+        const lowSpeedThreshold = 1.38; // 5 km/h
+        if (this.speed < lowSpeedThreshold) {
+            lowSpeedFactor = Math.max(0, this.speed / lowSpeedThreshold);
+        }
+
+        // Effective max regenerative electrical power
+        const maxRegenElectricPower = Math.min(this.peakGenPower, maxBatteryChargePower) * thermalDerate * lowSpeedFactor;
+
+        // Effective max regenerative torque at motor
+        let maxRegenMotorTorque = this.maxMotorTorque * thermalDerate * lowSpeedFactor;
+        if (motorAngularVel > 1.0) {
+            const powerLimitedTorque = (maxRegenElectricPower / this.inverterEfficiency / this.motorEfficiency) / motorAngularVel;
+            maxRegenMotorTorque = Math.min(maxRegenMotorTorque, powerLimitedTorque);
+        }
+
+        // 5. Tire-Road Adhesion & ABS Check
+        const normalForce = this.mass * this.gravity * Math.cos(gradeRad);
+        const maxAdhesionForce = this.surfaceFriction * normalForce;
+
+        // 6. Torque Blending Execution
+        this.regenTorque = 0.0;
+        this.frictionTorque = 0.0;
+        let actualMotorDriveTorque = 0.0;
+
+        if (this.speed <= 0.01 && demandedDriveTorque <= 0) {
+            // Stationary
+            this.speed = 0.0;
+            this.acceleration = 0.0;
+            this.drivePower = 0.0;
+            this.regenPower = 0.0;
+            this.frictionPower = 0.0;
+            this.totalBrakingForce = 0.0;
+            this.slipRatio = 0.0;
+            this.absEngaged = false;
+        } else if (demandedDriveTorque > 0 && demandedBrakingTorque <= 0) {
+            // ACCELERATION MODE
+            // Speed-dependent power curve
+            let maxAvailableDriveTorque = this.maxMotorTorque;
+            if (motorAngularVel > 1.0) {
+                const maxDriveTorqueByPower = this.peakDrivePower / motorAngularVel;
+                maxAvailableDriveTorque = Math.min(this.maxMotorTorque, maxDriveTorqueByPower);
+            }
+            actualMotorDriveTorque = Math.min(demandedDriveTorque, maxAvailableDriveTorque) * thermalDerate;
+            const driveForce = (actualMotorDriveTorque * this.gearRatio * this.drivetrainEfficiency) / this.tireRadius;
+
+            // Traction control limit
+            const clampedDriveForce = Math.min(driveForce, maxAdhesionForce * 0.95);
+            const netForce = clampedDriveForce - fAero - fRoll - fGrade;
+            this.acceleration = netForce / this.mass;
+
+            this.drivePower = actualMotorDriveTorque * motorAngularVel / (this.motorEfficiency * this.inverterEfficiency);
+            this.regenPower = 0.0;
+            this.frictionPower = 0.0;
+            this.totalBrakingForce = 0.0;
+            this.absEngaged = false;
+        } else if (demandedBrakingTorque > 0) {
+            // BRAKING MODE
+            if (this.blendingStrategy === 'series' || this.blendingStrategy === 'one-pedal') {
+                // Fully Decoupled Series Blending: Prioritize Regen 100% up to limits
+                this.regenTorque = Math.min(demandedBrakingTorque, maxRegenMotorTorque);
+                this.frictionTorque = Math.max(0, demandedBrakingTorque - this.regenTorque);
+            } else {
+                // Parallel Blending: Mechanical friction always kicks in proportionally
+                const fixedFrictionRatio = 0.40; // 40% mechanical baseline
+                const baseFriction = demandedBrakingTorque * fixedFrictionRatio;
+                const remainingDemand = demandedBrakingTorque - baseFriction;
+                this.regenTorque = Math.min(remainingDemand, maxRegenMotorTorque);
+                this.frictionTorque = baseFriction + (remainingDemand - this.regenTorque);
+            }
+
+            // Convert torques to linear braking forces
+            const regenBrakingForce = (this.regenTorque * this.gearRatio * this.drivetrainEfficiency) / this.tireRadius;
+            const frictionBrakingForce = (this.frictionTorque * this.gearRatio * this.drivetrainEfficiency) / this.tireRadius;
+            let totalRequestedBrakeForce = regenBrakingForce + frictionBrakingForce;
+
+            // ABS modulation if demand exceeds tire grip
+            if (totalRequestedBrakeForce > maxAdhesionForce) {
+                this.absEngaged = true;
+                this.slipRatio = 0.18; // optimal slip window
+                // Under ABS intervention, regenerative torque is quickly attenuated to avoid electric drivetrain resonance
+                this.regenTorque *= 0.3;
+                const modulatedRegen = (this.regenTorque * this.gearRatio * this.drivetrainEfficiency) / this.tireRadius;
+                totalRequestedBrakeForce = maxAdhesionForce * 0.95; // modulated threshold
+                this.totalBrakingForce = totalRequestedBrakeForce;
+            } else {
+                this.absEngaged = false;
+                this.slipRatio = Math.min(0.12, (totalRequestedBrakeForce / maxAdhesionForce) * 0.08);
+                this.totalBrakingForce = totalRequestedBrakeForce;
+            }
+
+            const netBrakingForce = this.totalBrakingForce + fAero + fRoll + fGrade;
+            this.acceleration = -netBrakingForce / this.mass;
+
+            // Powers
+            const mechanicalRegenPower = this.regenTorque * motorAngularVel;
+            this.regenPower = mechanicalRegenPower * this.motorEfficiency * this.inverterEfficiency;
+            this.frictionPower = (this.frictionTorque * this.gearRatio / this.tireRadius) * this.speed;
+            this.drivePower = 0.0;
+        } else {
+            // COASTING
+            this.acceleration = -(fAero + fRoll + fGrade) / this.mass;
+            this.drivePower = 0.0;
+            this.regenPower = 0.0;
+            this.frictionPower = 0.0;
+            this.totalBrakingForce = 0.0;
+            this.absEngaged = false;
+        }
+
+        // 7. Integrate Speed & Position
+        const prevSpeed = this.speed;
+        this.speed += this.acceleration * dt;
+        if (this.speed < 0) {
+            this.speed = 0;
+            this.acceleration = 0;
+        }
+        this.distance += ((prevSpeed + this.speed) * 0.5) * dt;
+
+        // 8. Dynamic Pitch (dive angle under braking or squat under accel)
+        const targetPitch = Math.max(-4.5, Math.min(3.0, (this.acceleration / this.gravity) * 3.5));
+        this.pitchAngle += (targetPitch - this.pitchAngle) * Math.min(1.0, dt * 10.0);
+
+        // 9. Battery Equivalent Circuit Model & SoC Integration
+        if (this.regenPower > 0) {
+            // Charging battery: I < 0
+            // P_dc = V_term * |I| = (V_oc + |I| * R_i) * |I| = R_i * I^2 + V_oc * |I|
+            const a = this.internalResistance;
+            const b = packOcv;
+            const c = -this.regenPower;
+            const iCharge = (-b + Math.sqrt(Math.max(0, b * b - 4 * a * c))) / (2 * a);
+            this.batteryCurrent = -iCharge; // negative convention for charge
+            this.terminalVoltage = packOcv + iCharge * this.internalResistance;
+
+            // Coulomb counting
+            const deltaAh = (iCharge * dt) / 3600.0;
+            this.soc = Math.min(100.0, this.soc + (deltaAh / this.batteryCapacityAh) * 100.0);
+
+            // Energy recovered
+            const energyRecoveredJoules = this.regenPower * dt;
+            this.totalEnergyRecovered += energyRecoveredJoules;
+            if (this.brakingEventActive) {
+                this.eventRecoveredEnergy += energyRecoveredJoules;
+            }
+        } else if (this.drivePower > 0) {
+            // Discharging battery: I > 0
+            // P_dc = (V_oc - I * R_i) * I = V_oc * I - R_i * I^2
+            const a = -this.internalResistance;
+            const b = packOcv;
+            const c = -this.drivePower;
+            const discriminant = Math.max(0, b * b - 4 * a * c);
+            const iDischarge = (-b + Math.sqrt(discriminant)) / (2 * a);
+            this.batteryCurrent = iDischarge;
+            this.terminalVoltage = packOcv - iDischarge * this.internalResistance;
+
+            // Coulomb counting
+            const deltaAh = (iDischarge * dt) / 3600.0;
+            this.soc = Math.max(0.0, this.soc - (deltaAh / this.batteryCapacityAh) * 100.0);
+            this.totalEnergyExpended += this.drivePower * dt;
+        } else {
+            this.batteryCurrent = 0.0;
+            this.terminalVoltage = packOcv;
+        }
+
+        // 10. Kinetic Energy & Friction Heat Tracking
+        const currentKineticEnergy = 0.5 * this.mass * Math.pow(this.speed, 2);
+        const prevKineticEnergy = 0.5 * this.mass * Math.pow(prevSpeed, 2);
+        if (prevKineticEnergy > currentKineticEnergy) {
+            this.totalKineticEnergyLost += (prevKineticEnergy - currentKineticEnergy);
+        }
+        this.totalFrictionHeatDissipated += this.frictionPower * dt;
+
+        // 11. Brake Disc Thermal Model
+        // Front discs take ~65% of friction braking, rear discs take ~35%
+        const heatCapacityFront = 1200.0; // J/°C for iron brake disc assembly
+        const heatCapacityRear = 900.0;
+        const frontHeatRate = this.frictionPower * 0.65;
+        const rearHeatRate = this.frictionPower * 0.35;
+        const coolingFactor = 0.15 + (this.speed / 20.0) * 0.45; // airspeed cooling
+
+        this.frontBrakeDiscTemp += ((frontHeatRate / heatCapacityFront) - coolingFactor * (this.frontBrakeDiscTemp - 25.0)) * dt;
+        this.rearBrakeDiscTemp += ((rearHeatRate / heatCapacityRear) - coolingFactor * (this.rearBrakeDiscTemp - 25.0)) * dt;
+        this.frontBrakeDiscTemp = Math.max(25.0, this.frontBrakeDiscTemp);
+        this.rearBrakeDiscTemp = Math.max(25.0, this.rearBrakeDiscTemp);
+
+        // Inverter & Motor Thermal Updates
+        const invLoss = this.regenPower * (1.0 - this.inverterEfficiency) + this.drivePower * (1.0 - this.inverterEfficiency);
+        this.inverterTemp += ((invLoss / 800.0) - 0.05 * (this.inverterTemp - 30.0)) * dt;
+        const motorLoss = Math.abs(this.regenTorque + actualMotorDriveTorque) * motorAngularVel * (1.0 - this.motorEfficiency);
+        this.motorTemp += ((motorLoss / 1500.0) - 0.03 * (this.motorTemp - 30.0)) * dt;
+
+        // 12. Braking Event Benchmark Tracker
+        if (demandedBrakingTorque > 0.05 && !this.brakingEventActive && prevSpeed > 2.0) {
+            this.brakingEventActive = true;
+            this.eventInitialSpeed = prevSpeed;
+            this.eventInitialDistance = this.distance;
+            this.eventKineticEnergyStart = 0.5 * this.mass * Math.pow(prevSpeed, 2);
+            this.eventRecoveredEnergy = 0.0;
+            this.eventStoppingTime = 0.0;
+        }
+
+        if (this.brakingEventActive) {
+            this.eventStoppingTime += dt;
+            this.eventStoppingDistance = this.distance - this.eventInitialDistance;
+            if (this.speed <= 0.05 || (demandedBrakingTorque <= 0.01 && this.driverThrottle > 0.05)) {
+                this.brakingEventActive = false;
+            }
+        }
+    }
+
+    // Get real-time comprehensive telemetry package
+    getTelemetry() {
+        const speedKmh = this.speed * 3.6;
+        const speedMph = speedKmh * 0.621371;
+        const totalBrakeTorque = this.regenTorque + this.frictionTorque;
+        const regenTorquePercent = totalBrakeTorque > 0.1 ? (this.regenTorque / totalBrakeTorque) * 100 : 0;
+        const frictionTorquePercent = totalBrakeTorque > 0.1 ? (this.frictionTorque / totalBrakeTorque) * 100 : 0;
+
+        const eventKineticLost = Math.max(0, this.eventKineticEnergyStart - (0.5 * this.mass * Math.pow(this.speed, 2)));
+        const eventEfficiency = eventKineticLost > 1000 ? (this.eventRecoveredEnergy / eventKineticLost) * 100 : 0;
+
+        return {
+            speedKmh: speedKmh.toFixed(1),
+            speedMph: speedMph.toFixed(1),
+            speedMs: this.speed.toFixed(2),
+            accelerationG: (this.acceleration / this.gravity).toFixed(2),
+            motorRpm: Math.round(this.motorRpm),
+            backEmf: this.backEmf.toFixed(1),
+            regenPowerKw: (this.regenPower / 1000.0).toFixed(2),
+            drivePowerKw: (this.drivePower / 1000.0).toFixed(2),
+            frictionPowerKw: (this.frictionPower / 1000.0).toFixed(2),
+            regenTorqueNm: Math.round(this.regenTorque),
+            frictionTorqueNm: Math.round(this.frictionTorque),
+            regenTorquePercent: regenTorquePercent.toFixed(1),
+            frictionTorquePercent: frictionTorquePercent.toFixed(1),
+            soc: this.soc.toFixed(2),
+            terminalVoltage: this.terminalVoltage.toFixed(1),
+            batteryCurrent: this.batteryCurrent.toFixed(1),
+            frontDiscTemp: Math.round(this.frontBrakeDiscTemp),
+            rearDiscTemp: Math.round(this.rearBrakeDiscTemp),
+            motorTemp: Math.round(this.motorTemp),
+            inverterTemp: Math.round(this.inverterTemp),
+            totalEnergyRecoveredWh: (this.totalEnergyRecovered / 3600.0).toFixed(2),
+            totalKineticEnergyLostWh: (this.totalKineticEnergyLost / 3600.0).toFixed(2),
+            eventStoppingDistance: this.eventStoppingDistance.toFixed(1),
+            eventStoppingTime: this.eventStoppingTime.toFixed(2),
+            eventEfficiency: Math.min(100, Math.max(0, eventEfficiency)).toFixed(1),
+            absEngaged: this.absEngaged,
+            slipRatio: (this.slipRatio * 100).toFixed(1),
+            pitchAngle: this.pitchAngle.toFixed(2)
+        };
+    }
+}
+
+// Export for module/browser environments
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { VehiclePhysics };
+}
+
+
+    // --- 2. 3D SCENE VISUALIZER ---
+/**
+ * scene3d.js - Interactive 3D EV Powertrain & Regenerative Braking Visualizer
+ * Vehicle is oriented longitudinally along the Z axis (Forward = -Z, Rear = +Z).
+ * Axles and wheels are aligned along the X axis.
+ * Road stretches straight forward down the Z axis into the distance.
+ */
+
+class EVVisualizer3D {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.cameraMode = 'orbit'; // 'orbit', 'xray_motor', 'brake_wheel', 'chase', 'top'
+        this.xrayMode = true; // default translucent body for powertrain visibility
+        this.roadGradeAngle = 0; // road slope in degrees
+        this.init();
+    }
+
+    init() {
+        const width = this.container.clientWidth || window.innerWidth;
+        const height = this.container.clientHeight || window.innerHeight;
+
+        // 1. Scene & Renderer
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x080b11);
+        this.scene.fog = new THREE.FogExp2(0x080b11, 0.015);
+
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+        this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.shadowMap.enabled = true;
+        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.container.innerHTML = '';
+        this.container.appendChild(this.renderer.domElement);
+
+        // 2. Camera & OrbitControls
+        this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 400);
+        // Default perspective: 3/4 isometric elevated angle looking down the road at the car
+        this.camera.position.set(4.5, 3.2, 5.5);
+
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.06;
+        this.controls.maxPolarAngle = Math.PI / 2 - 0.02; // prevent going beneath road
+        this.controls.minDistance = 2.2;
+        this.controls.maxDistance = 22.0;
+        this.controls.target.set(0, 0.6, 0);
+
+        // 3. Lighting
+        this.setupLights();
+
+        // 4. Moving Road Environment
+        this.setupEnvironment();
+
+        // 5. Vehicle Assembly (Oriented along Z axis: Front = -Z, Rear = +Z)
+        this.setupVehicle();
+
+        // 6. Energy Flow Particle System
+        this.setupEnergyFlowParticles();
+
+        // Resize Listener
+        window.addEventListener('resize', () => this.onWindowResize());
+    }
+
+    setupLights() {
+        const ambient = new THREE.AmbientLight(0xffffff, 0.75);
+        this.scene.add(ambient);
+
+        // Key light from high front-right
+        const keyLight = new THREE.DirectionalLight(0xe2e8f0, 1.3);
+        keyLight.position.set(8, 14, 10);
+        keyLight.castShadow = true;
+        keyLight.shadow.mapSize.width = 2048;
+        keyLight.shadow.mapSize.height = 2048;
+        keyLight.shadow.camera.near = 0.5;
+        keyLight.shadow.camera.far = 35;
+        const d = 5;
+        keyLight.shadow.camera.left = -d;
+        keyLight.shadow.camera.right = d;
+        keyLight.shadow.camera.top = d;
+        keyLight.shadow.camera.bottom = -d;
+        this.scene.add(keyLight);
+
+        // Rear rim light
+        const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.8);
+        rimLight.position.set(-8, 6, -12);
+        this.scene.add(rimLight);
+
+        // Battery green/cyan glow light
+        this.batteryGlowLight = new THREE.PointLight(0x06b6d4, 1.6, 4.5);
+        this.batteryGlowLight.position.set(0, 0.45, 0);
+        this.scene.add(this.batteryGlowLight);
+
+        // Front Motor Drive Unit glow light
+        this.motorGlowLight = new THREE.PointLight(0x10b981, 2.0, 3.5);
+        this.motorGlowLight.position.set(0, 0.5, -1.4);
+        this.scene.add(this.motorGlowLight);
+    }
+
+    setupEnvironment() {
+        this.roadGroup = new THREE.Group();
+        this.scene.add(this.roadGroup);
+
+        const roadWidth = 14;
+        const roadLength = 160;
+
+        // Create high-tech asphalt road with painted dashes and highway grid
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 1024;
+        const ctx = canvas.getContext('2d');
+
+        // Asphalt dark gray
+        ctx.fillStyle = '#0f141f';
+        ctx.fillRect(0, 0, 512, 1024);
+
+        // Shoulder boundaries
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(40, 0, 6, 1024);
+        ctx.fillRect(466, 0, 6, 1024);
+
+        // Center dashed line
+        ctx.fillStyle = '#f8fafc';
+        for (let y = 0; y < 1024; y += 128) {
+            ctx.fillRect(252, y + 20, 8, 88);
+        }
+
+        // Faint grid crossbars
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+        ctx.lineWidth = 2;
+        for (let y = 0; y < 1024; y += 64) {
+            ctx.beginPath();
+            ctx.moveTo(40, y);
+            ctx.lineTo(466, y);
+            ctx.stroke();
+        }
+
+        this.roadTexture = new THREE.CanvasTexture(canvas);
+        this.roadTexture.wrapS = THREE.RepeatWrapping;
+        this.roadTexture.wrapT = THREE.RepeatWrapping;
+        this.roadTexture.repeat.set(1, 6);
+
+        const roadGeo = new THREE.PlaneGeometry(roadWidth, roadLength, 10, 40);
+        const roadMat = new THREE.MeshStandardMaterial({
+            map: this.roadTexture,
+            roughness: 0.85,
+            metalness: 0.15
+        });
+
+        // Rotate plane so it lies flat on X-Z ground
+        this.roadMesh = new THREE.Mesh(roadGeo, roadMat);
+        this.roadMesh.rotation.x = -Math.PI / 2;
+        this.roadMesh.position.y = -0.01;
+        this.roadMesh.receiveShadow = true;
+        this.roadGroup.add(this.roadMesh);
+
+        // Ground grid floor extending outside road
+        const gridHelper = new THREE.GridHelper(160, 80, 0x0284c7, 0x1e293b);
+        gridHelper.position.y = -0.02;
+        this.roadGroup.add(gridHelper);
+
+        // Roadside reflective distance posts along +Z and -Z
+        this.posts = [];
+        const postGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.9, 8);
+        const postMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
+        const reflectorMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+
+        for (let z = -70; z <= 70; z += 14) {
+            [-7.2, 7.2].forEach(x => {
+                const post = new THREE.Mesh(postGeo, postMat);
+                post.position.set(x, 0.45, z);
+                const reflector = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.12, 0.08), reflectorMat);
+                reflector.position.set(x, 0.75, z);
+                this.roadGroup.add(post);
+                this.roadGroup.add(reflector);
+                this.posts.push({ post, reflector, baseZ: z });
+            });
+        }
+    }
+
+    setupVehicle() {
+        this.vehicleGroup = new THREE.Group();
+        this.scene.add(this.vehicleGroup);
+
+        // Suspension body group (pitches forward under braking)
+        this.bodyGroup = new THREE.Group();
+        this.vehicleGroup.add(this.bodyGroup);
+
+        // Longitudinal Geometry:
+        // Forward is -Z, Rear is +Z
+        // Left is -X, Right is +X
+        // Up is +Y
+        const wheelbase = 2.8; // m (front axle at z = -1.4, rear axle at z = +1.4)
+        const trackWidth = 1.65; // m (left wheel at x = -0.825, right wheel at x = +0.825)
+        const wheelRadius = 0.32; // m
+
+        this.wheelRadius = wheelRadius;
+        this.wheelbase = wheelbase;
+        this.trackWidth = trackWidth;
+
+        // --- 1. SKATEBOARD CHASSIS ALUMINUM RAILS ---
+        const frameMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.2 });
+        // Frame box: Width along X (1.35), Height along Y (0.12), Length along Z (3.8)
+        const frameGeo = new THREE.BoxGeometry(1.35, 0.12, 3.8);
+        const frameMesh = new THREE.Mesh(frameGeo, frameMat);
+        frameMesh.position.set(0, wheelRadius + 0.05, 0);
+        frameMesh.castShadow = true;
+        frameMesh.receiveShadow = true;
+        this.bodyGroup.add(frameMesh);
+
+        // --- 2. HIGH-VOLTAGE BATTERY PACK (Low center of gravity, between axles) ---
+        const batteryCaseGeo = new THREE.BoxGeometry(1.25, 0.22, 1.95);
+        const batteryCaseMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.9, roughness: 0.15 });
+        const batteryCase = new THREE.Mesh(batteryCaseGeo, batteryCaseMat);
+        batteryCase.position.set(0, wheelRadius + 0.08, 0);
+        batteryCase.castShadow = true;
+        this.bodyGroup.add(batteryCase);
+
+        // Glowing translucent top cover showing battery modules
+        const batteryCoverGeo = new THREE.PlaneGeometry(1.18, 1.88);
+        this.batteryCoverMat = new THREE.MeshStandardMaterial({
+            color: 0x06b6d4,
+            emissive: 0x0891b2,
+            emissiveIntensity: 0.6,
+            transparent: true,
+            opacity: 0.85,
+            roughness: 0.2
+        });
+        const batteryCover = new THREE.Mesh(batteryCoverGeo, this.batteryCoverMat);
+        batteryCover.rotation.x = -Math.PI / 2;
+        batteryCover.position.set(0, wheelRadius + 0.192, 0);
+        this.bodyGroup.add(batteryCover);
+
+        // Battery cell module blocks
+        for (let z = -0.75; z <= 0.75; z += 0.25) {
+            for (let x = -0.45; x <= 0.45; x += 0.3) {
+                const modGeo = new THREE.BoxGeometry(0.24, 0.14, 0.20);
+                const modMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.85, roughness: 0.3 });
+                const modMesh = new THREE.Mesh(modGeo, modMat);
+                modMesh.position.set(x, wheelRadius + 0.14, z);
+                this.bodyGroup.add(modMesh);
+            }
+        }
+
+        // --- 3. FRONT ELECTRIC DRIVE UNIT (PMSM Motor + Inverter at z = -1.4) ---
+        // Motor cylinder along X axis
+        const motorGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.50, 24);
+        this.motorMat = new THREE.MeshStandardMaterial({
+            color: 0x334155,
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: 0x10b981,
+            emissiveIntensity: 0.2
+        });
+        this.frontMotor = new THREE.Mesh(motorGeo, this.motorMat);
+        this.frontMotor.rotation.z = Math.PI / 2; // align cylinder along X axis
+        this.frontMotor.position.set(0, wheelRadius + 0.05, -wheelbase * 0.5);
+        this.frontMotor.castShadow = true;
+        this.bodyGroup.add(this.frontMotor);
+
+        // Motor stator coils accent ring
+        const coilGeo = new THREE.TorusGeometry(0.23, 0.02, 16, 32);
+        this.statorCoilMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+        const statorCoil = new THREE.Mesh(coilGeo, this.statorCoilMat);
+        statorCoil.rotation.y = Math.PI / 2;
+        statorCoil.position.set(0, wheelRadius + 0.05, -wheelbase * 0.5);
+        this.bodyGroup.add(statorCoil);
+
+        // Bi-directional Power Inverter (Stacked atop motor)
+        const inverterGeo = new THREE.BoxGeometry(0.42, 0.16, 0.40);
+        this.inverterMat = new THREE.MeshStandardMaterial({
+            color: 0x1e293b,
+            metalness: 0.85,
+            roughness: 0.2,
+            emissive: 0x3b82f6,
+            emissiveIntensity: 0.25
+        });
+        this.inverterMesh = new THREE.Mesh(inverterGeo, this.inverterMat);
+        this.inverterMesh.position.set(0, wheelRadius + 0.28, -wheelbase * 0.5 + 0.05);
+        this.inverterMesh.castShadow = true;
+        this.bodyGroup.add(this.inverterMesh);
+
+        // High-Voltage Safety Orange Busbar Cables (Battery <-> Inverter)
+        const cableCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0.12, wheelRadius + 0.12, -0.95),
+            new THREE.Vector3(0.08, wheelRadius + 0.22, -1.15),
+            new THREE.Vector3(0.05, wheelRadius + 0.28, -wheelbase * 0.5 + 0.20)
+        ]);
+        const cableGeo = new THREE.TubeGeometry(cableCurve, 20, 0.022, 12, false);
+        const cableMat = new THREE.MeshStandardMaterial({ color: 0xff6600, metalness: 0.5, roughness: 0.4 });
+        const cableMesh = new THREE.Mesh(cableGeo, cableMat);
+        this.bodyGroup.add(cableMesh);
+
+        // Drive Half-Shafts (Axles along X axis)
+        const axleMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.2 });
+        const frontAxleGeo = new THREE.CylinderGeometry(0.025, 0.025, trackWidth, 16);
+        const frontAxle = new THREE.Mesh(frontAxleGeo, axleMat);
+        frontAxle.rotation.z = Math.PI / 2; // along X
+        frontAxle.position.set(0, wheelRadius, -wheelbase * 0.5);
+        this.bodyGroup.add(frontAxle);
+
+        const rearAxleGeo = new THREE.CylinderGeometry(0.025, 0.025, trackWidth, 16);
+        const rearAxle = new THREE.Mesh(rearAxleGeo, axleMat);
+        rearAxle.rotation.z = Math.PI / 2; // along X
+        rearAxle.position.set(0, wheelRadius, wheelbase * 0.5);
+        this.bodyGroup.add(rearAxle);
+
+        // --- 4. 4 WHEELS & VENTILATED BRAKE DISCS ---
+        this.wheels = [];
+        this.brakeDiscs = [];
+
+        const wheelCoords = [
+            { x: -trackWidth * 0.5, z: -wheelbase * 0.5, isFront: true, isLeft: true },   // Front Left
+            { x: trackWidth * 0.5, z: -wheelbase * 0.5, isFront: true, isLeft: false },   // Front Right
+            { x: -trackWidth * 0.5, z: wheelbase * 0.5, isFront: false, isLeft: true },   // Rear Left
+            { x: trackWidth * 0.5, z: wheelbase * 0.5, isFront: false, isLeft: false }    // Rear Right
+        ];
+
+        wheelCoords.forEach(pos => {
+            const wUnit = this.createWheelAssembly(pos.isLeft, pos.isFront);
+            wUnit.group.position.set(pos.x, wheelRadius, pos.z);
+            this.bodyGroup.add(wUnit.group);
+            this.wheels.push(wUnit);
+            this.brakeDiscs.push(wUnit.brakeDisc);
+        });
+
+        // --- 5. AERODYNAMIC VEHICLE BODY SHELL (Facing -Z) ---
+        this.createBodyShell();
+    }
+
+    createWheelAssembly(isLeft, isFront) {
+        const group = new THREE.Group();
+        const tireRadius = 0.32;
+        const tireWidth = 0.22;
+        const rimRadius = 0.22;
+
+        // Rotating Subgroup: rolls around X axis as vehicle moves forward along -Z!
+        const spinGroup = new THREE.Group();
+        group.add(spinGroup);
+
+        // 1. Tire Rubber (Cylinder along X axis)
+        const tireGeo = new THREE.CylinderGeometry(tireRadius, tireRadius, tireWidth, 32);
+        const tireMat = new THREE.MeshStandardMaterial({ color: 0x18181b, roughness: 0.9, metalness: 0.05 });
+        const tireMesh = new THREE.Mesh(tireGeo, tireMat);
+        tireMesh.rotation.z = Math.PI / 2; // along X axis
+        tireMesh.castShadow = true;
+        spinGroup.add(tireMesh);
+
+        // 2. High-Tech Wheel Rim
+        const rimGeo = new THREE.CylinderGeometry(rimRadius, rimRadius, tireWidth + 0.005, 16);
+        const rimMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.95, roughness: 0.15 });
+        const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+        rimMesh.rotation.z = Math.PI / 2;
+        spinGroup.add(rimMesh);
+
+        // Rim aero turbine spokes (spokes radiate out in Y-Z plane)
+        const spokeMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.9, roughness: 0.2 });
+        for (let i = 0; i < 5; i++) {
+            const spokeGeo = new THREE.BoxGeometry(0.015, rimRadius * 1.8, 0.035);
+            const spoke = new THREE.Mesh(spokeGeo, spokeMat);
+            spoke.rotation.x = (i * Math.PI) / 2.5;
+            spoke.position.x = isLeft ? -tireWidth * 0.48 : tireWidth * 0.48;
+            spinGroup.add(spoke);
+        }
+
+        // 3. Ventilated Brake Disc (Rotating with wheel)
+        const discRadius = isFront ? 0.17 : 0.15;
+        const discThickness = 0.018;
+        const discGeo = new THREE.CylinderGeometry(discRadius, discRadius, discThickness, 32);
+        const discMat = new THREE.MeshStandardMaterial({
+            color: 0x64748b,
+            metalness: 0.95,
+            roughness: 0.25,
+            emissive: new THREE.Color(0x000000),
+            emissiveIntensity: 0.0
+        });
+        const discMesh = new THREE.Mesh(discGeo, discMat);
+        discMesh.rotation.z = Math.PI / 2;
+        discMesh.position.x = isLeft ? 0.06 : -0.06;
+        spinGroup.add(discMesh);
+
+        // 4. Fixed Brake Caliper (Stationary, clamped to wheel knuckle)
+        const caliperGeo = new THREE.BoxGeometry(0.06, 0.10, 0.08);
+        const caliperMat = new THREE.MeshStandardMaterial({
+            color: 0xd97706, // Brembo style anodized caliper
+            metalness: 0.8,
+            roughness: 0.3
+        });
+        const caliperMesh = new THREE.Mesh(caliperGeo, caliperMat);
+        caliperMesh.position.set(isLeft ? 0.06 : -0.06, discRadius * 0.72, 0);
+        group.add(caliperMesh);
+
+        return {
+            group,
+            spinGroup,
+            brakeDisc: {
+                mesh: discMesh,
+                material: discMat,
+                isFront
+            }
+        };
+    }
+
+    createBodyShell() {
+        const bodyShapeGroup = new THREE.Group();
+
+        // 1. Lower Aerodynamic Body (Length along Z, Width along X)
+        const lowerGeo = new THREE.BoxGeometry(1.8, 0.45, 4.4);
+        this.bodyPaintMat = new THREE.MeshPhysicalMaterial({
+            color: 0x0284c7, // electric cyan/blue
+            metalness: 0.7,
+            roughness: 0.2,
+            transmission: this.xrayMode ? 0.85 : 0.0,
+            opacity: this.xrayMode ? 0.35 : 1.0,
+            transparent: true,
+            clearcoat: 1.0,
+            clearcoatRoughness: 0.1
+        });
+        const lowerBody = new THREE.Mesh(lowerGeo, this.bodyPaintMat);
+        lowerBody.position.set(0, 0.55, 0);
+        lowerBody.castShadow = true;
+        bodyShapeGroup.add(lowerBody);
+
+        // 2. Cockpit Greenhouse / Glass Cabin
+        const cabinGeo = new THREE.BoxGeometry(1.45, 0.55, 2.4);
+        this.cabinGlassMat = new THREE.MeshPhysicalMaterial({
+            color: 0x38bdf8,
+            metalness: 0.1,
+            roughness: 0.1,
+            transmission: 0.9,
+            opacity: 0.3,
+            transparent: true
+        });
+        const cabinMesh = new THREE.Mesh(cabinGeo, this.cabinGlassMat);
+        cabinMesh.position.set(0, 0.95, 0.2); // cabin slightly rearward
+        bodyShapeGroup.add(cabinMesh);
+
+        // 3. LED Headlights (Facing Forward at z = -2.18)
+        const lightGeo = new THREE.BoxGeometry(0.35, 0.06, 0.08);
+        const headLightMat = new THREE.MeshStandardMaterial({
+            color: 0xe0f2fe,
+            emissive: 0x38bdf8,
+            emissiveIntensity: 1.5
+        });
+        const frontLeftHeadlight = new THREE.Mesh(lightGeo, headLightMat);
+        frontLeftHeadlight.position.set(-0.65, 0.58, -2.18);
+        bodyShapeGroup.add(frontLeftHeadlight);
+
+        const frontRightHeadlight = new THREE.Mesh(lightGeo, headLightMat);
+        frontRightHeadlight.position.set(0.65, 0.58, -2.18);
+        bodyShapeGroup.add(frontRightHeadlight);
+
+        // 4. LED Taillights / Brake Lights (At Rear at z = +2.18)
+        this.brakeLightMat = new THREE.MeshStandardMaterial({
+            color: 0xef4444,
+            emissive: 0xef4444,
+            emissiveIntensity: 0.3
+        });
+        const rearLeftLight = new THREE.Mesh(lightGeo, this.brakeLightMat);
+        rearLeftLight.position.set(-0.65, 0.65, 2.18);
+        bodyShapeGroup.add(rearLeftLight);
+
+        const rearRightLight = new THREE.Mesh(lightGeo, this.brakeLightMat);
+        rearRightLight.position.set(0.65, 0.65, 2.18);
+        bodyShapeGroup.add(rearRightLight);
+
+        this.bodyGroup.add(bodyShapeGroup);
+        this.bodyShapeGroup = bodyShapeGroup;
+    }
+
+    setupEnergyFlowParticles() {
+        // High-voltage pulsating energy flow along Z axis:
+        // Front Wheels (z = -1.4) <-> Motor & Inverter (z = -1.4) <-> Battery Pack (z = 0)
+        const particleCount = 200;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+        const colors = new Float32Array(particleCount * 3);
+
+        // Left Spline: Front Left Wheel Hub (-0.8, 0.32, -1.4) -> Motor Stator -> Inverter -> Battery Pack
+        this.regenPathLeft = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-0.8, 0.32, -1.4),   // Front Left Hub
+            new THREE.Vector3(-0.3, 0.35, -1.4),   // Left Half-Shaft
+            new THREE.Vector3(0.0, 0.42, -1.4),    // Motor Stator
+            new THREE.Vector3(0.0, 0.60, -1.35),   // Inverter
+            new THREE.Vector3(0.0, 0.45, -0.9),    // HV Busbar entry
+            new THREE.Vector3(0.0, 0.40, 0.0),     // Battery pack center
+            new THREE.Vector3(0.0, 0.40, 0.6)      // Battery rear modules
+        ]);
+
+        // Right Spline: Front Right Wheel Hub (+0.8, 0.32, -1.4) -> Motor Stator -> Inverter -> Battery Pack
+        this.regenPathRight = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(0.8, 0.32, -1.4),    // Front Right Hub
+            new THREE.Vector3(0.3, 0.35, -1.4),    // Right Half-Shaft
+            new THREE.Vector3(0.0, 0.42, -1.4),    // Motor Stator
+            new THREE.Vector3(0.0, 0.60, -1.35),   // Inverter
+            new THREE.Vector3(0.0, 0.45, -0.9),    // HV Busbar entry
+            new THREE.Vector3(0.0, 0.40, 0.0),     // Battery pack center
+            new THREE.Vector3(0.0, 0.40, 0.6)      // Battery rear modules
+        ]);
+
+        this.particleData = [];
+        for (let i = 0; i < particleCount; i++) {
+            const isLeft = i % 2 === 0;
+            const progress = Math.random();
+            this.particleData.push({
+                isLeft,
+                progress,
+                speed: 0.25 + Math.random() * 0.35
+            });
+
+            const pt = (isLeft ? this.regenPathLeft : this.regenPathRight).getPoint(progress);
+            positions[i * 3] = pt.x;
+            positions[i * 3 + 1] = pt.y;
+            positions[i * 3 + 2] = pt.z;
+
+            colors[i * 3] = 0.05;
+            colors[i * 3 + 1] = 0.95;
+            colors[i * 3 + 2] = 0.65;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+        // Procedural particle glow canvas texture
+        const pCanvas = document.createElement('canvas');
+        pCanvas.width = 64;
+        pCanvas.height = 64;
+        const pCtx = pCanvas.getContext('2d');
+        const grad = pCtx.createRadialGradient(32, 32, 0, 32, 32, 30);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        grad.addColorStop(0.35, 'rgba(56, 189, 248, 0.9)');
+        grad.addColorStop(0.7, 'rgba(16, 185, 129, 0.4)');
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        pCtx.fillStyle = grad;
+        pCtx.fillRect(0, 0, 64, 64);
+        const pTexture = new THREE.CanvasTexture(pCanvas);
+
+        const pMaterial = new THREE.PointsMaterial({
+            size: 0.16,
+            map: pTexture,
+            transparent: true,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        this.particleSystem = new THREE.Points(geometry, pMaterial);
+        this.bodyGroup.add(this.particleSystem);
+    }
+
+    setCameraPreset(mode) {
+        this.cameraMode = mode;
+        switch (mode) {
+            case 'xray_motor':
+                // Focus on front motor & inverter from front 3/4
+                this.animateCameraTo(new THREE.Vector3(1.8, 1.4, -2.8), new THREE.Vector3(0, 0.45, -1.4));
+                break;
+            case 'brake_wheel':
+                // Focus tightly on front-left wheel brake disc
+                this.animateCameraTo(new THREE.Vector3(-1.9, 0.45, -1.4), new THREE.Vector3(-0.8, 0.32, -1.4));
+                break;
+            case 'chase':
+                // Behind the car looking straight forward down the road
+                this.animateCameraTo(new THREE.Vector3(0, 2.2, 5.8), new THREE.Vector3(0, 0.6, -2.5));
+                break;
+            case 'top':
+                // Directly above looking down at energy flow
+                this.animateCameraTo(new THREE.Vector3(0.01, 8.5, 0), new THREE.Vector3(0, 0.4, 0));
+                break;
+            case 'orbit':
+            default:
+                // Elevated isometric view
+                this.animateCameraTo(new THREE.Vector3(4.8, 3.2, 5.2), new THREE.Vector3(0, 0.6, 0));
+                break;
+        }
+    }
+
+    animateCameraTo(newPos, newTarget) {
+        this.camStartPos = this.camera.position.clone();
+        this.camEndPos = newPos.clone();
+        this.targetStartPos = this.controls.target.clone();
+        this.targetEndPos = newTarget.clone();
+        this.camAnimTime = 0.0;
+        this.camAnimating = true;
+    }
+
+    toggleXRayMode(enable) {
+        this.xrayMode = enable !== undefined ? enable : !this.xrayMode;
+        if (this.bodyPaintMat) {
+            this.bodyPaintMat.transmission = this.xrayMode ? 0.85 : 0.0;
+            this.bodyPaintMat.opacity = this.xrayMode ? 0.35 : 1.0;
+            this.bodyPaintMat.needsUpdate = true;
+        }
+        return this.xrayMode;
+    }
+
+    setRoadGrade(gradePercent) {
+        // Tilt the road mesh and environment to physically reflect uphill/downhill grade
+        // grade % = tan(angle) * 100
+        const rad = Math.atan(gradePercent / 100.0);
+        this.roadGradeAngle = rad;
+        if (this.roadGroup) {
+            this.roadGroup.rotation.x = rad;
+        }
+    }
+
+    update(physics, dt) {
+        // 1. Camera Animation
+        if (this.camAnimating) {
+            this.camAnimTime += dt * 2.5;
+            const t = Math.min(1.0, this.camAnimTime);
+            const ease = 0.5 - 0.5 * Math.cos(t * Math.PI);
+
+            this.camera.position.lerpVectors(this.camStartPos, this.camEndPos, ease);
+            this.controls.target.lerpVectors(this.targetStartPos, this.targetEndPos, ease);
+
+            if (t >= 1.0) {
+                this.camAnimating = false;
+            }
+        }
+        this.controls.update();
+
+        // 2. Road & Ground Scrolling (Moving straight forward down -Z)
+        // Texture moves along Y in canvas texture -> reflects movement along Z in world!
+        if (this.roadTexture) {
+            this.roadTexture.offset.y += (physics.speed * dt * 0.06);
+        }
+
+        // Roadside post recycling for infinite continuous motion feel
+        if (this.posts && physics.speed > 0.01) {
+            const shift = (physics.speed * dt * 1.5) % 14.0;
+            this.posts.forEach(p => {
+                let curZ = p.baseZ + shift;
+                if (curZ > 70) curZ -= 140;
+                p.post.position.z = curZ;
+                p.reflector.position.z = curZ;
+            });
+        }
+
+        // 3. Wheel Spin (Rolling forward along -Z around X axis)
+        const angularTravel = (physics.speed / this.wheelRadius) * dt;
+        this.wheels.forEach(w => {
+            // Negative rotation around X axis rolls top toward -Z (forward!)
+            w.spinGroup.rotation.x -= angularTravel;
+        });
+
+        // 4. Vehicle Suspension Pitch (Dives forward under braking around X axis)
+        const pitchRad = (physics.pitchAngle * Math.PI) / 180.0;
+        this.bodyGroup.rotation.x = pitchRad; // pitch forward toward -Z
+
+        // 5. Dynamic Brake Disc Thermal Glow
+        this.updateBrakeThermal(physics);
+
+        // 6. Dynamic Energy Flow Particles & Glow
+        this.updateEnergyParticles(physics, dt);
+
+        // 7. Taillight Brake Flare
+        if (this.brakeLightMat) {
+            if (physics.driverBrake > 0.05 || (physics.blendingStrategy === 'one-pedal' && physics.regenPower > 5000)) {
+                this.brakeLightMat.emissiveIntensity = 2.5;
+            } else {
+                this.brakeLightMat.emissiveIntensity = 0.3;
+            }
+        }
+
+        // 8. Render
+        this.renderer.render(this.scene, this.camera);
+    }
+
+    updateBrakeThermal(physics) {
+        const frontTemp = physics.frontBrakeDiscTemp;
+        const rearTemp = physics.rearBrakeDiscTemp;
+
+        this.brakeDiscs.forEach(disc => {
+            const temp = disc.isFront ? frontTemp : rearTemp;
+            if (temp > 180.0) {
+                const heatFactor = Math.min(1.0, (temp - 180.0) / 450.0);
+                const r = Math.min(1.0, 0.4 + heatFactor * 0.6);
+                const g = Math.max(0.0, (heatFactor - 0.4) * 0.7);
+                disc.material.emissive.setRGB(r, g, 0.0);
+                disc.material.emissiveIntensity = heatFactor * 2.8;
+            } else {
+                disc.material.emissiveIntensity = 0.0;
+            }
+        });
+    }
+
+    updateEnergyParticles(physics, dt) {
+        const positions = this.particleSystem.geometry.attributes.position.array;
+        const colors = this.particleSystem.geometry.attributes.color.array;
+        const count = this.particleData.length;
+
+        const isRegen = physics.regenPower > 500;
+        const isDrive = physics.drivePower > 500;
+        const powerMag = isRegen ? (physics.regenPower / 1000.0) : (physics.drivePower / 1000.0);
+        const flowSpeed = Math.min(2.5, 0.25 + (powerMag / 45.0) * 0.75);
+
+        if (isRegen) {
+            this.batteryGlowLight.color.setHex(0x10b981);
+            this.batteryGlowLight.intensity = Math.min(3.5, 0.8 + (powerMag / 30.0));
+            this.motorGlowLight.color.setHex(0x06b6d4);
+            this.motorGlowLight.intensity = Math.min(4.0, 1.0 + (powerMag / 25.0));
+            this.statorCoilMat.color.setHex(0x10b981);
+        } else if (isDrive) {
+            this.batteryGlowLight.color.setHex(0x38bdf8);
+            this.batteryGlowLight.intensity = Math.min(3.5, 0.8 + (powerMag / 30.0));
+            this.motorGlowLight.color.setHex(0x6366f1);
+            this.motorGlowLight.intensity = Math.min(4.0, 1.0 + (powerMag / 25.0));
+            this.statorCoilMat.color.setHex(0x38bdf8);
+        } else {
+            this.batteryGlowLight.intensity = 0.3;
+            this.motorGlowLight.intensity = 0.3;
+            this.statorCoilMat.color.setHex(0x334155);
+        }
+
+        for (let i = 0; i < count; i++) {
+            const p = this.particleData[i];
+
+            if (isRegen) {
+                // Wheels -> Motor -> Battery (progress 0.0 -> 1.0)
+                p.progress += p.speed * flowSpeed * dt;
+                if (p.progress > 1.0) p.progress -= 1.0;
+
+                colors[i * 3] = 0.05;
+                colors[i * 3 + 1] = 0.95;
+                colors[i * 3 + 2] = 0.65;
+            } else if (isDrive) {
+                // Battery -> Motor -> Wheels (reverse progress 1.0 -> 0.0)
+                p.progress -= p.speed * flowSpeed * dt;
+                if (p.progress < 0.0) p.progress += 1.0;
+
+                colors[i * 3] = 0.25;
+                colors[i * 3 + 1] = 0.65;
+                colors[i * 3 + 2] = 1.0;
+            } else {
+                p.progress += 0.05 * dt;
+                if (p.progress > 1.0) p.progress -= 1.0;
+                colors[i * 3] = 0.15;
+                colors[i * 3 + 1] = 0.25;
+                colors[i * 3 + 2] = 0.40;
+            }
+
+            const spline = p.isLeft ? this.regenPathLeft : this.regenPathRight;
+            const pt = spline.getPoint(p.progress);
+            positions[i * 3] = pt.x;
+            positions[i * 3 + 1] = pt.y;
+            positions[i * 3 + 2] = pt.z;
+        }
+
+        this.particleSystem.geometry.attributes.position.needsUpdate = true;
+        this.particleSystem.geometry.attributes.color.needsUpdate = true;
+    }
+
+    onWindowResize() {
+        const width = this.container.clientWidth;
+        const height = this.container.clientHeight;
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(width, height);
+    }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { EVVisualizer3D };
+}
+
+
+    // --- 3. TELEMETRY DASHBOARD ---
+/**
+ * telemetry.js - Real-time Oscilloscope Strip Charts & Gauges
+ * Canvas-rendered multi-channel telemetry with high-performance buffer
+ */
+
+class TelemetryDashboard {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.maxSamples = 160;
+
+        // Channel history buffers
+        this.history = {
+            time: [],
+            speed: [],
+            regenPower: [],
+            drivePower: [],
+            regenTorque: [],
+            frictionTorque: [],
+            soc: [],
+            voltage: []
+        };
+
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+
+    resize() {
+        if (!this.canvas) return;
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width * (window.devicePixelRatio || 1);
+        this.canvas.height = rect.height * (window.devicePixelRatio || 1);
+        this.ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+        this.width = rect.width;
+        this.height = rect.height;
+    }
+
+    pushData(telemetry) {
+        this.history.speed.push(parseFloat(telemetry.speedKmh));
+        this.history.regenPower.push(parseFloat(telemetry.regenPowerKw));
+        this.history.drivePower.push(parseFloat(telemetry.drivePowerKw));
+        this.history.regenTorque.push(parseFloat(telemetry.regenTorqueNm));
+        this.history.frictionTorque.push(parseFloat(telemetry.frictionTorqueNm));
+        this.history.soc.push(parseFloat(telemetry.soc));
+        this.history.voltage.push(parseFloat(telemetry.terminalVoltage));
+
+        // Trim buffer
+        for (const key in this.history) {
+            if (this.history[key].length > this.maxSamples) {
+                this.history[key].shift();
+            }
+        }
+    }
+
+    render() {
+        if (!this.canvas || !this.ctx) return;
+        const ctx = this.ctx;
+        const w = this.width;
+        const h = this.height;
+
+        // Clear background
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, w, h);
+
+        // Draw grid lines
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = 0; x < w; x += 40) {
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, h);
+        }
+        for (let y = 0; y < h; y += 30) {
+            ctx.moveTo(0, y);
+            ctx.lineTo(w, y);
+        }
+        ctx.stroke();
+
+        // Split canvas into two plots:
+        // Top half: Speed & Torque Blending
+        // Bottom half: Power Flow (Drive vs Regen kW)
+        const midY = h * 0.5;
+
+        // Center line separator
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, midY);
+        ctx.lineTo(w, midY);
+        ctx.stroke();
+
+        const count = this.history.speed.length;
+        if (count < 2) return;
+
+        const stepX = w / (this.maxSamples - 1);
+
+        // --- PLOT 1: Speed (Cyan) & Friction/Regen Torque ---
+        // 1A. Speed curve (0 - 150 km/h)
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const x = i * stepX;
+            const normSpeed = Math.min(1.0, this.history.speed[i] / 150.0);
+            const y = (midY - 10) - normSpeed * (midY - 25);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // 1B. Regen Torque (Green)
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const x = i * stepX;
+            const normTorque = Math.min(1.0, this.history.regenTorque[i] / 350.0);
+            const y = (midY - 10) - normTorque * (midY - 25);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // 1C. Friction Torque (Red/Orange dashed)
+        ctx.strokeStyle = '#ef4444';
+        ctx.setLineDash([4, 3]);
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const x = i * stepX;
+            const normFriction = Math.min(1.0, this.history.frictionTorque[i] / 350.0);
+            const y = (midY - 10) - normFriction * (midY - 25);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]); // reset dash
+
+        // Labels for Plot 1
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px monospace';
+        ctx.fillText('SPEED (km/h) & TORQUE (Nm)', 10, 16);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText('● Speed', 180, 16);
+        ctx.fillStyle = '#10b981';
+        ctx.fillText('● Regen Torque', 240, 16);
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText('● Friction Brake', 345, 16);
+
+        // --- PLOT 2: POWER FLOW (kW) (Bottom Half) ---
+        // Center zero line for bottom plot
+        const zeroPowerY = midY + (h - midY) * 0.55;
+        ctx.strokeStyle = '#475569';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        ctx.beginPath();
+        ctx.moveTo(0, zeroPowerY);
+        ctx.lineTo(w, zeroPowerY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Fill area for Regen Power (Green above zero)
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.25)';
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        ctx.moveTo(0, zeroPowerY);
+        for (let i = 0; i < count; i++) {
+            const x = i * stepX;
+            const kw = this.history.regenPower[i]; // positive
+            const y = zeroPowerY - (kw / 120.0) * (zeroPowerY - midY - 10);
+            ctx.lineTo(x, y);
+        }
+        ctx.lineTo((count - 1) * stepX, zeroPowerY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Line for Drive Power (Blue/Amber below zero)
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.0;
+        ctx.beginPath();
+        for (let i = 0; i < count; i++) {
+            const x = i * stepX;
+            const kw = this.history.drivePower[i];
+            const y = zeroPowerY + (kw / 150.0) * (h - zeroPowerY - 10);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Labels for Plot 2
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px monospace';
+        ctx.fillText('POWER FLOW (kW)', 10, midY + 16);
+        ctx.fillStyle = '#10b981';
+        ctx.fillText('+ REGEN (to Battery)', 120, midY + 16);
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillText('- DRIVE (Discharge)', 260, midY + 16);
+    }
+}
+
+// Export
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { TelemetryDashboard };
+}
+
+
+    // --- 4. AUDIO ENGINE ---
+/**
+ * audio.js - Synthesized Web Audio Engine for EV Motor & Inverter PWM Whine
+ */
+
+class EVAudioEngine {
+    constructor() {
+        this.ctx = null;
+        this.enabled = false;
+        this.initialized = false;
+    }
+
+    init() {
+        if (this.initialized) return;
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            this.ctx = new AudioContext();
+
+            // 1. Motor Whine (RPM-dependent triangle oscillator)
+            this.motorOsc = this.ctx.createOscillator();
+            this.motorOsc.type = 'triangle';
+            this.motorOsc.frequency.setValueAtTime(60, this.ctx.currentTime);
+
+            this.motorGain = this.ctx.createGain();
+            this.motorGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+
+            // Filter for motor body resonance
+            this.motorFilter = this.ctx.createBiquadFilter();
+            this.motorFilter.type = 'bandpass';
+            this.motorFilter.Q.setValueAtTime(3.0, this.ctx.currentTime);
+            this.motorFilter.frequency.setValueAtTime(400, this.ctx.currentTime);
+
+            this.motorOsc.connect(this.motorFilter);
+            this.motorFilter.connect(this.motorGain);
+            this.motorGain.connect(this.ctx.destination);
+            this.motorOsc.start();
+
+            // 2. Inverter High-Pitch PWM / Regen Whine (Sine wave)
+            this.regenOsc = this.ctx.createOscillator();
+            this.regenOsc.type = 'sine';
+            this.regenOsc.frequency.setValueAtTime(800, this.ctx.currentTime);
+
+            this.regenGain = this.ctx.createGain();
+            this.regenGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+
+            this.regenOsc.connect(this.regenGain);
+            this.regenGain.connect(this.ctx.destination);
+            this.regenOsc.start();
+
+            this.initialized = true;
+            this.enabled = true;
+        } catch (e) {
+            console.warn('Web Audio not allowed or supported:', e);
+        }
+    }
+
+    toggle() {
+        if (!this.initialized) {
+            this.init();
+            return true;
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume();
+        }
+        this.enabled = !this.enabled;
+        if (!this.enabled && this.motorGain) {
+            this.motorGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+            this.regenGain.gain.setValueAtTime(0.0, this.ctx.currentTime);
+        }
+        return this.enabled;
+    }
+
+    update(physics) {
+        if (!this.initialized || !this.enabled || !this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        const rpm = Math.max(0, physics.motorRpm);
+
+        // Motor pitch: base frequency 50Hz + (rpm / 14000) * 1200Hz
+        const motorFreq = 50 + (rpm / 12000.0) * 1100.0;
+        this.motorOsc.frequency.setTargetAtTime(motorFreq, now, 0.05);
+        this.motorFilter.frequency.setTargetAtTime(motorFreq * 1.5, now, 0.05);
+
+        // Drive volume
+        if (physics.drivePower > 1000) {
+            const driveVol = Math.min(0.2, (physics.drivePower / 120000.0) * 0.2);
+            this.motorGain.gain.setTargetAtTime(driveVol, now, 0.05);
+        } else {
+            this.motorGain.gain.setTargetAtTime(0.01, now, 0.1);
+        }
+
+        // Regen pitch and volume (crisp electric whine)
+        if (physics.regenPower > 1000) {
+            const regenFreq = 400 + (rpm / 10000.0) * 1800.0;
+            this.regenOsc.frequency.setTargetAtTime(regenFreq, now, 0.05);
+            const regenVol = Math.min(0.25, (physics.regenPower / 90000.0) * 0.25);
+            this.regenGain.gain.setTargetAtTime(regenVol, now, 0.05);
+        } else {
+            this.regenGain.gain.setTargetAtTime(0.0, now, 0.08);
+        }
+    }
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { EVAudioEngine };
+}
+
+
+    // --- 5. MAIN CONTROLLER ---
+/**
+ * main.js - Master Application Controller & Drive Cycle Orchestrator
+ * Fully wires all left-panel controls, visual pedals, fault injections, and automated scenarios.
+ */
+
+window.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Core Systems
+    const physics = new VehiclePhysics({
+        mass: 1600,
+        batteryCapacityKWh: 64,
+        initialSoc: 80.0,
+        peakGenPower: 100000,
+        peakDrivePower: 150000,
+        blendingStrategy: 'series',
+        initialSpeed: 0.0
+    });
+
+    const visualizer = new EVVisualizer3D('viewport-3d');
+    const dashboard = new TelemetryDashboard('telemetry-canvas');
+    const audio = new EVAudioEngine();
+
+    // 2. Scenario Automation State Machine
+    let activeScenario = null;
+    let scenarioStage = 0;
+    let scenarioTimer = 0.0;
+    let isPaused = false;
+
+    // Driver inputs from keyboard
+    const keys = {
+        throttle: false,
+        brake: false
+    };
+
+    // 3. UI DOM References
+    const dom = {
+        // Speed & Primary Gauges
+        speedVal: document.getElementById('val-speed'),
+        speedUnit: document.getElementById('unit-speed'),
+        accelVal: document.getElementById('val-accel'),
+        powerVal: document.getElementById('val-power'),
+        powerBadge: document.getElementById('badge-power-state'),
+        powerBar: document.getElementById('bar-power-fill'),
+
+        // Torque Blending
+        regenTorqueVal: document.getElementById('val-regen-torque'),
+        frictionTorqueVal: document.getElementById('val-friction-torque'),
+        regenBar: document.getElementById('bar-regen-split'),
+        frictionBar: document.getElementById('bar-friction-split'),
+        regenPercent: document.getElementById('pct-regen-split'),
+        frictionPercent: document.getElementById('pct-friction-split'),
+
+        // Energy Recovery Benchmark
+        energyRecoveredWh: document.getElementById('val-energy-recovered'),
+        energyEfficiency: document.getElementById('val-energy-efficiency'),
+        stoppingDist: document.getElementById('val-stopping-dist'),
+        stoppingTime: document.getElementById('val-stopping-time'),
+
+        // Battery Monitor
+        socVal: document.getElementById('val-soc'),
+        socBar: document.getElementById('bar-soc-fill'),
+        voltageVal: document.getElementById('val-voltage'),
+        currentVal: document.getElementById('val-current'),
+        batteryTempVal: document.getElementById('val-bat-temp'),
+
+        // Motor & Inverter
+        motorRpmVal: document.getElementById('val-motor-rpm'),
+        backEmfVal: document.getElementById('val-back-emf'),
+        motorTempVal: document.getElementById('val-motor-temp'),
+        inverterTempVal: document.getElementById('val-inverter-temp'),
+
+        // Brakes & Safety
+        discTempVal: document.getElementById('val-disc-temp'),
+        absBadge: document.getElementById('badge-abs'),
+        taperBadge: document.getElementById('badge-taper'),
+        invFaultBadge: document.getElementById('badge-inv-fault'),
+
+        // Interactive Pedals & Controls
+        pedalThrottle: document.getElementById('pedal-throttle'),
+        pedalBrake: document.getElementById('pedal-brake'),
+        throttleValueDisplay: document.getElementById('throttle-val-display'),
+        brakeValueDisplay: document.getElementById('brake-val-display'),
+
+        // Tuning inputs (Left Panel)
+        inputMass: document.getElementById('param-mass'),
+        inputMassVal: document.getElementById('param-mass-val'),
+        inputGenPower: document.getElementById('param-gen-power'),
+        inputGenPowerVal: document.getElementById('param-gen-power-val'),
+        inputBatterySoc: document.getElementById('param-soc'),
+        inputBatterySocVal: document.getElementById('param-soc-val'),
+        selectBlending: document.getElementById('param-blending'),
+        inputGrade: document.getElementById('param-grade'),
+        inputGradeVal: document.getElementById('param-grade-val'),
+        selectFriction: document.getElementById('param-friction'),
+
+        // Fault buttons
+        btnFaultOverheat: document.getElementById('btn-fault-overheat'),
+        btnFaultInvTrip: document.getElementById('btn-fault-invtrip'),
+
+        // Scenario Banner
+        scenarioBanner: document.getElementById('hud-scenario-banner'),
+        scenarioText: document.getElementById('scenario-banner-text'),
+        btnCancelScenario: document.getElementById('btn-cancel-scenario'),
+
+        // Header Buttons
+        btnPause: document.getElementById('btn-pause'),
+        btnReset: document.getElementById('btn-reset'),
+        btnAudio: document.getElementById('btn-audio'),
+        btnXRay: document.getElementById('btn-xray')
+    };
+
+    // 4. Pedal Visual Representation Synchronizer
+    function setThrottlePedalVisual(val) {
+        physics.driverThrottle = Math.max(0, Math.min(1, val));
+        if (dom.pedalThrottle) {
+            dom.pedalThrottle.style.setProperty('--press-height', `${physics.driverThrottle * 100}%`);
+        }
+        if (dom.throttleValueDisplay) {
+            dom.throttleValueDisplay.textContent = `${Math.round(physics.driverThrottle * 100)}%`;
+        }
+    }
+
+    function setBrakePedalVisual(val) {
+        physics.driverBrake = Math.max(0, Math.min(1, val));
+        if (dom.pedalBrake) {
+            dom.pedalBrake.style.setProperty('--press-height', `${physics.driverBrake * 100}%`);
+        }
+        if (dom.brakeValueDisplay) {
+            dom.brakeValueDisplay.textContent = `${Math.round(physics.driverBrake * 100)}%`;
+        }
+    }
+
+    // 5. Mouse/Touch Drag Controls for Pedals
+    setupPedalPointer(dom.pedalThrottle, (val) => {
+        abortScenario();
+        setThrottlePedalVisual(val);
+    });
+
+    setupPedalPointer(dom.pedalBrake, (val) => {
+        abortScenario();
+        setBrakePedalVisual(val);
+    });
+
+    function setupPedalPointer(element, onChange) {
+        if (!element) return;
+        let isDown = false;
+
+        const updateFromPointer = (e) => {
+            const rect = element.getBoundingClientRect();
+            const rawY = e.clientY - rect.top;
+            const progress = Math.max(0, Math.min(1, 1.0 - (rawY / rect.height)));
+            onChange(progress);
+        };
+
+        element.addEventListener('pointerdown', (e) => {
+            isDown = true;
+            element.setPointerCapture(e.pointerId);
+            updateFromPointer(e);
+            audio.init();
+        });
+
+        element.addEventListener('pointermove', (e) => {
+            if (isDown) updateFromPointer(e);
+        });
+
+        const release = (e) => {
+            if (isDown) {
+                isDown = false;
+                onChange(0.0);
+            }
+        };
+
+        element.addEventListener('pointerup', release);
+        element.addEventListener('pointercancel', release);
+    }
+
+    // 6. Keyboard Listeners
+    window.addEventListener('keydown', (e) => {
+        if (['ArrowUp', 'KeyW'].includes(e.code)) {
+            abortScenario();
+            keys.throttle = true;
+            setThrottlePedalVisual(0.85);
+            audio.init();
+        } else if (['ArrowDown', 'KeyS'].includes(e.code)) {
+            abortScenario();
+            keys.brake = true;
+            setBrakePedalVisual(0.80);
+            audio.init();
+        } else if (e.code === 'Space') {
+            abortScenario();
+            keys.brake = true;
+            setBrakePedalVisual(1.0);
+            e.preventDefault();
+            audio.init();
+        } else if (e.code === 'KeyX') {
+            const isXray = visualizer.toggleXRayMode();
+            if (dom.btnXRay) dom.btnXRay.classList.toggle('active', isXray);
+        } else if (e.code === 'KeyM') {
+            toggleAudio();
+        } else if (e.code === 'Digit1') setCameraView('orbit');
+        else if (e.code === 'Digit2') setCameraView('xray_motor');
+        else if (e.code === 'Digit3') setCameraView('brake_wheel');
+        else if (e.code === 'Digit4') setCameraView('chase');
+        else if (e.code === 'Digit5') setCameraView('top');
+    });
+
+    window.addEventListener('keyup', (e) => {
+        if (['ArrowUp', 'KeyW'].includes(e.code)) {
+            keys.throttle = false;
+            if (!activeScenario) setThrottlePedalVisual(0.0);
+        } else if (['ArrowDown', 'KeyS', 'Space'].includes(e.code)) {
+            keys.brake = false;
+            if (!activeScenario) setBrakePedalVisual(0.0);
+        }
+    });
+
+    // 7. Camera View Switching
+    function setCameraView(mode) {
+        document.querySelectorAll('.btn-cam-view').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.view === mode);
+        });
+        visualizer.setCameraPreset(mode);
+    }
+
+    document.querySelectorAll('.btn-cam-view').forEach(btn => {
+        btn.addEventListener('click', () => setCameraView(btn.dataset.view));
+    });
+
+    // 8. LEFT PANEL CONTROLS - Full Integration
+
+    // A. Vehicle Mass
+    if (dom.inputMass) {
+        dom.inputMass.addEventListener('input', (e) => {
+            physics.mass = parseFloat(e.target.value);
+            if (dom.inputMassVal) dom.inputMassVal.textContent = `${physics.mass} kg`;
+        });
+    }
+
+    // B. Peak Generator Power
+    if (dom.inputGenPower) {
+        dom.inputGenPower.addEventListener('input', (e) => {
+            const kw = parseFloat(e.target.value);
+            physics.peakGenPower = kw * 1000;
+            if (dom.inputGenPowerVal) dom.inputGenPowerVal.textContent = `${kw} kW`;
+        });
+    }
+
+    // C. Battery Initial SoC
+    if (dom.inputBatterySoc) {
+        dom.inputBatterySoc.addEventListener('input', (e) => {
+            physics.soc = parseFloat(e.target.value);
+            if (dom.inputBatterySocVal) dom.inputBatterySocVal.textContent = `${physics.soc}%`;
+        });
+    }
+
+    // D. Control Strategy
+    if (dom.selectBlending) {
+        dom.selectBlending.addEventListener('change', (e) => {
+            physics.blendingStrategy = e.target.value;
+        });
+    }
+
+    // E. Road Grade (Physical slope + 3D Visual slope!)
+    if (dom.inputGrade) {
+        dom.inputGrade.addEventListener('input', (e) => {
+            const grade = parseFloat(e.target.value);
+            physics.roadGrade = grade;
+            if (dom.inputGradeVal) dom.inputGradeVal.textContent = `${grade}%`;
+            visualizer.setRoadGrade(grade);
+        });
+    }
+
+    // F. Surface Friction (Adhesion μ)
+    if (dom.selectFriction) {
+        dom.selectFriction.addEventListener('change', (e) => {
+            physics.surfaceFriction = parseFloat(e.target.value);
+        });
+    }
+
+    // G. Fault Injection: Inverter Overheat Toggle
+    if (dom.btnFaultOverheat) {
+        dom.btnFaultOverheat.addEventListener('click', () => {
+            physics.inverterOverheat = !physics.inverterOverheat;
+            dom.btnFaultOverheat.classList.toggle('btn-fault-active', physics.inverterOverheat);
+            if (physics.inverterOverheat) {
+                physics.inverterTemp = 86.0;
+                dom.btnFaultOverheat.textContent = '🔥 Overheat Active (75% Derate)';
+            } else {
+                physics.inverterTemp = 45.0;
+                dom.btnFaultOverheat.textContent = '🔥 Inverter Overheat';
+            }
+        });
+    }
+
+    // H. Fault Injection: Inverter Trip Shutdown
+    if (dom.btnFaultInvTrip) {
+        dom.btnFaultInvTrip.addEventListener('click', () => {
+            physics.inverterFault = !physics.inverterFault;
+            dom.btnFaultInvTrip.classList.toggle('btn-fault-active', physics.inverterFault);
+            if (physics.inverterFault) {
+                dom.btnFaultInvTrip.textContent = '⚠️ Inverter Tripped (0 kW)';
+            } else {
+                dom.btnFaultInvTrip.textContent = '⚠️ Inverter Trip';
+            }
+        });
+    }
+
+    // 9. AUTOMATED SCENARIOS (DRIVE CYCLES)
+    document.querySelectorAll('.btn-scenario').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const scenario = btn.dataset.scenario;
+            startScenario(scenario, btn);
+        });
+    });
+
+    if (dom.btnCancelScenario) {
+        dom.btnCancelScenario.addEventListener('click', () => abortScenario());
+    }
+
+    function startScenario(scenario, clickedBtn) {
+        activeScenario = scenario;
+        scenarioStage = 0;
+        scenarioTimer = 0.0;
+        audio.init();
+
+        document.querySelectorAll('.btn-scenario').forEach(b => b.classList.remove('active'));
+        if (clickedBtn) clickedBtn.classList.add('active');
+
+        if (dom.scenarioBanner) dom.scenarioBanner.style.display = 'flex';
+
+        // Configure scenario initial conditions
+        switch (scenario) {
+            case 'emergency_stop':
+                setScenarioBanner('Phase 1: Accelerating vehicle to 100 km/h...');
+                setThrottlePedalVisual(1.0);
+                setBrakePedalVisual(0.0);
+                break;
+            case 'highway_decel':
+                setScenarioBanner('Phase 1: Reaching 120 km/h highway speed...');
+                setThrottlePedalVisual(1.0);
+                setBrakePedalVisual(0.0);
+                break;
+            case 'mountain_descent':
+                // Set grade to -8% and tilt 3D road
+                physics.roadGrade = -8.0;
+                if (dom.inputGrade) dom.inputGrade.value = -8;
+                if (dom.inputGradeVal) dom.inputGradeVal.textContent = '-8%';
+                visualizer.setRoadGrade(-8.0);
+                physics.speed = 60.0 / 3.6; // 60 km/h
+                setScenarioBanner('Mountain -8% Grade: Continuous regenerative descent at 60 km/h...');
+                break;
+            case 'high_soc_taper':
+                // Set battery to 98.5%
+                physics.soc = 98.5;
+                if (dom.inputBatterySoc) dom.inputBatterySoc.value = 98.5;
+                if (dom.inputBatterySocVal) dom.inputBatterySocVal.textContent = '98.5%';
+                physics.speed = 85.0 / 3.6;
+                setScenarioBanner('High SoC (98.5%): Battery overcharge protection active!');
+                break;
+            case 'wet_road_abs':
+                // Set road to wet
+                physics.surfaceFriction = 0.45;
+                if (dom.selectFriction) dom.selectFriction.value = '0.45';
+                physics.speed = 90.0 / 3.6;
+                setScenarioBanner('Wet Surface (μ = 0.45): Slamming brakes to test ABS modulation...');
+                break;
+            case 'wltp_cycle':
+                physics.speed = 0.0;
+                setScenarioBanner('WLTP Urban Cycle: Segment 1 (Launch to 35 km/h)...');
+                setThrottlePedalVisual(0.7);
+                setBrakePedalVisual(0.0);
+                break;
+        }
+    }
+
+    function setScenarioBanner(text) {
+        if (dom.scenarioText) dom.scenarioText.textContent = text;
+    }
+
+    function abortScenario() {
+        if (!activeScenario) return;
+        activeScenario = null;
+        scenarioStage = 0;
+        scenarioTimer = 0.0;
+        document.querySelectorAll('.btn-scenario').forEach(b => b.classList.remove('active'));
+        if (dom.scenarioBanner) dom.scenarioBanner.style.display = 'none';
+        setThrottlePedalVisual(0.0);
+        setBrakePedalVisual(0.0);
+    }
+
+    // 10. Multi-Stage Scenario Processor
+    function processScenario(dt) {
+        if (!activeScenario) return;
+        scenarioTimer += dt;
+        const speedKmh = physics.speed * 3.6;
+
+        switch (activeScenario) {
+            case 'emergency_stop':
+                if (scenarioStage === 0) {
+                    // Accelerate to 100 km/h
+                    setThrottlePedalVisual(1.0);
+                    setBrakePedalVisual(0.0);
+                    if (speedKmh >= 99.5 || scenarioTimer > 10.0) {
+                        scenarioStage = 1;
+                        scenarioTimer = 0.0;
+                        setScenarioBanner('Phase 2: 🛑 EMERGENCY BRAKE ENGAGED! Decelerating to 0 km/h...');
+                        setThrottlePedalVisual(0.0);
+                        setBrakePedalVisual(1.0); // full emergency brake!
+                    }
+                } else if (scenarioStage === 1) {
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(1.0);
+                    if (physics.speed <= 0.05) {
+                        scenarioStage = 2;
+                        scenarioTimer = 0.0;
+                        const tel = physics.getTelemetry();
+                        setScenarioBanner(`Stopped! Dist: ${tel.eventStoppingDistance}m, Recovered: ${tel.totalEnergyRecoveredWh} Wh (Efficiency: ${tel.eventEfficiency}%)`);
+                        setBrakePedalVisual(0.0);
+                    }
+                } else if (scenarioStage === 2) {
+                    // Hold results for 3.5 seconds
+                    if (scenarioTimer > 3.5) abortScenario();
+                }
+                break;
+
+            case 'highway_decel':
+                if (scenarioStage === 0) {
+                    setThrottlePedalVisual(1.0);
+                    setBrakePedalVisual(0.0);
+                    if (speedKmh >= 119.5 || scenarioTimer > 12.0) {
+                        scenarioStage = 1;
+                        scenarioTimer = 0.0;
+                        setScenarioBanner('Phase 2: Applying 45% Decoupled Series Regen (120 → 50 km/h)...');
+                        setThrottlePedalVisual(0.0);
+                        setBrakePedalVisual(0.45);
+                    }
+                } else if (scenarioStage === 1) {
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(0.45);
+                    if (speedKmh <= 50.5) {
+                        scenarioStage = 2;
+                        scenarioTimer = 0.0;
+                        const tel = physics.getTelemetry();
+                        setScenarioBanner(`Deceleration complete! Energy Harvested: ${tel.totalEnergyRecoveredWh} Wh`);
+                        setBrakePedalVisual(0.0);
+                    }
+                } else if (scenarioStage === 2) {
+                    if (scenarioTimer > 3.5) abortScenario();
+                }
+                break;
+
+            case 'mountain_descent':
+                // Gravity pulls downhill. Cruise regulation applies regen to hold 60 km/h
+                const speedError = 60.0 - speedKmh;
+                setThrottlePedalVisual(0.0);
+                if (speedError < -1.0) {
+                    setBrakePedalVisual(Math.min(0.65, -speedError * 0.05));
+                } else {
+                    setBrakePedalVisual(0.25);
+                }
+                setScenarioBanner(`Mountain Pass: Harvesting continuous regen (+${(physics.regenPower / 1000).toFixed(1)} kW) without brake wear! [${(10 - scenarioTimer).toFixed(1)}s]`);
+                if (scenarioTimer > 10.0) {
+                    const tel = physics.getTelemetry();
+                    setScenarioBanner(`Descent Complete! Harvested: ${tel.totalEnergyRecoveredWh} Wh. Mechanical brakes remained cool!`);
+                    setBrakePedalVisual(0.0);
+                    setTimeout(() => abortScenario(), 3500);
+                    activeScenario = null;
+                }
+                break;
+
+            case 'high_soc_taper':
+                if (scenarioStage === 0) {
+                    // Apply brake at high SoC
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(0.70);
+                    setScenarioBanner('Braking at 98.5% SoC: Electric Regen = 0 kW (Taper Lockout). 100% Friction Calipers Active!');
+                    if (physics.speed <= 0.05) {
+                        scenarioStage = 1;
+                        scenarioTimer = 0.0;
+                        setBrakePedalVisual(0.0);
+                        setScenarioBanner(`Stop Complete! Notice 0 Wh recovered & Discs heated to ${Math.round(physics.frontBrakeDiscTemp)}°C (Thermal Glow).`);
+                    }
+                } else if (scenarioStage === 1) {
+                    if (scenarioTimer > 4.0) abortScenario();
+                }
+                break;
+
+            case 'wet_road_abs':
+                if (scenarioStage === 0) {
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(0.95);
+                    setScenarioBanner('Braking hard on wet road: ABS actively pulsating to prevent wheel lockup!');
+                    if (physics.speed <= 0.05) {
+                        scenarioStage = 1;
+                        scenarioTimer = 0.0;
+                        setBrakePedalVisual(0.0);
+                        setScenarioBanner(`Wet Stop Complete! Slip managed at ${(physics.slipRatio * 100).toFixed(1)}% via ABS.`);
+                    }
+                } else if (scenarioStage === 1) {
+                    if (scenarioTimer > 3.5) abortScenario();
+                }
+                break;
+
+            case 'wltp_cycle':
+                if (scenarioTimer < 4.0) {
+                    setThrottlePedalVisual(0.65);
+                    setBrakePedalVisual(0.0);
+                    setScenarioBanner(`WLTP Phase 1: Accelerating to 35 km/h [${scenarioTimer.toFixed(1)}s]`);
+                } else if (scenarioTimer < 7.0) {
+                    setThrottlePedalVisual(0.15);
+                    setBrakePedalVisual(0.0);
+                    setScenarioBanner(`WLTP Phase 2: Steady Urban Cruise at 35 km/h [${scenarioTimer.toFixed(1)}s]`);
+                } else if (scenarioTimer < 11.0) {
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(0.40);
+                    setScenarioBanner(`WLTP Phase 3: Regenerative Decel to 12 km/h [${scenarioTimer.toFixed(1)}s]`);
+                } else if (scenarioTimer < 15.0) {
+                    setThrottlePedalVisual(0.80);
+                    setBrakePedalVisual(0.0);
+                    setScenarioBanner(`WLTP Phase 4: Acceleration to 50 km/h [${scenarioTimer.toFixed(1)}s]`);
+                } else if (scenarioTimer < 19.0) {
+                    setThrottlePedalVisual(0.0);
+                    setBrakePedalVisual(0.55);
+                    setScenarioBanner(`WLTP Phase 5: Final Regenerative Stop [${scenarioTimer.toFixed(1)}s]`);
+                } else {
+                    const tel = physics.getTelemetry();
+                    setBrakePedalVisual(0.0);
+                    setScenarioBanner(`WLTP Cycle Complete! Total Recovered: ${tel.totalEnergyRecoveredWh} Wh.`);
+                    setTimeout(() => abortScenario(), 3500);
+                    activeScenario = null;
+                }
+                break;
+        }
+    }
+
+    // 11. Header Buttons
+    if (dom.btnPause) {
+        dom.btnPause.addEventListener('click', () => {
+            isPaused = !isPaused;
+            dom.btnPause.textContent = isPaused ? '▶ Resume' : '⏸ Pause';
+        });
+    }
+
+    if (dom.btnReset) {
+        dom.btnReset.addEventListener('click', () => {
+            physics.reset({
+                mass: parseFloat(dom.inputMass?.value || 1600),
+                batteryCapacityKWh: 64,
+                initialSoc: parseFloat(dom.inputBatterySoc?.value || 80),
+                peakGenPower: parseFloat(dom.inputGenPower?.value || 100) * 1000,
+                blendingStrategy: dom.selectBlending?.value || 'series'
+            });
+            abortScenario();
+            visualizer.setRoadGrade(0);
+            if (dom.inputGrade) dom.inputGrade.value = 0;
+            if (dom.inputGradeVal) dom.inputGradeVal.textContent = '0%';
+            if (dom.btnFaultOverheat) {
+                dom.btnFaultOverheat.classList.remove('btn-fault-active');
+                dom.btnFaultOverheat.textContent = '🔥 Inverter Overheat';
+            }
+            if (dom.btnFaultInvTrip) {
+                dom.btnFaultInvTrip.classList.remove('btn-fault-active');
+                dom.btnFaultInvTrip.textContent = '⚠️ Inverter Trip';
+            }
+            setThrottlePedalVisual(0.0);
+            setBrakePedalVisual(0.0);
+        });
+    }
+
+    function toggleAudio() {
+        const isEnabled = audio.toggle();
+        if (dom.btnAudio) {
+            dom.btnAudio.textContent = isEnabled ? '🔊 Audio ON' : '🔇 Audio Muted';
+            dom.btnAudio.classList.toggle('active', isEnabled);
+        }
+    }
+    if (dom.btnAudio) dom.btnAudio.addEventListener('click', toggleAudio);
+
+    if (dom.btnXRay) {
+        dom.btnXRay.addEventListener('click', () => {
+            const isXray = visualizer.toggleXRayMode();
+            dom.btnXRay.classList.toggle('active', isXray);
+        });
+    }
+
+    // 12. MASTER SIMULATION LOOP
+    let lastTime = performance.now();
+
+    function animate(now) {
+        requestAnimationFrame(animate);
+
+        const dt = Math.min(0.04, (now - lastTime) / 1000.0);
+        lastTime = now;
+
+        if (isPaused) return;
+
+        // Process active automated drive cycle scenario
+        if (activeScenario) {
+            processScenario(dt);
+        }
+
+        // Advance Physics
+        physics.update(dt);
+
+        // Advance 3D Scene (Moving straight forward down road!)
+        visualizer.update(physics, dt);
+
+        // Update Audio
+        audio.update(physics);
+
+        // Update Dashboard Data & Strip Charts
+        const telemetry = physics.getTelemetry();
+        dashboard.pushData(telemetry);
+        dashboard.render();
+
+        // Update All HUD Readouts & Dials
+        updateHUD(telemetry, physics);
+    }
+
+    function updateHUD(t, p) {
+        if (dom.speedVal) dom.speedVal.textContent = t.speedKmh;
+        if (dom.accelVal) dom.accelVal.textContent = `${t.accelerationG} g`;
+
+        // Power Display (kW)
+        if (parseFloat(t.regenPowerKw) > 0.1) {
+            dom.powerVal.textContent = `+${t.regenPowerKw} kW`;
+            dom.powerVal.className = 'telemetry-val text-green';
+            dom.powerBadge.textContent = 'REGENERATING';
+            dom.powerBadge.className = 'badge badge-green';
+            dom.powerBar.style.width = `${Math.min(100, (parseFloat(t.regenPowerKw) / (p.peakGenPower / 1000)) * 100)}%`;
+            dom.powerBar.className = 'bar-fill bar-green';
+        } else if (parseFloat(t.drivePowerKw) > 0.1) {
+            dom.powerVal.textContent = `-${t.drivePowerKw} kW`;
+            dom.powerVal.className = 'telemetry-val text-blue';
+            dom.powerBadge.textContent = 'MOTOR DRIVE';
+            dom.powerBadge.className = 'badge badge-blue';
+            dom.powerBar.style.width = `${Math.min(100, (parseFloat(t.drivePowerKw) / 150.0) * 100)}%`;
+            dom.powerBar.className = 'bar-fill bar-blue';
+        } else {
+            dom.powerVal.textContent = `0.0 kW`;
+            dom.powerVal.className = 'telemetry-val text-muted';
+            dom.powerBadge.textContent = 'IDLE';
+            dom.powerBadge.className = 'badge badge-muted';
+            dom.powerBar.style.width = '0%';
+        }
+
+        // Torque Blending Split
+        if (dom.regenTorqueVal) dom.regenTorqueVal.textContent = `${t.regenTorqueNm} Nm`;
+        if (dom.frictionTorqueVal) dom.frictionTorqueVal.textContent = `${t.frictionTorqueNm} Nm`;
+        if (dom.regenBar) dom.regenBar.style.width = `${t.regenTorquePercent}%`;
+        if (dom.frictionBar) dom.frictionBar.style.width = `${t.frictionTorquePercent}%`;
+        if (dom.regenPercent) dom.regenPercent.textContent = `${t.regenTorquePercent}%`;
+        if (dom.frictionPercent) dom.frictionPercent.textContent = `${t.frictionTorquePercent}%`;
+
+        // Battery Telemetry
+        if (dom.socVal) dom.socVal.textContent = `${t.soc}%`;
+        if (dom.socBar) {
+            dom.socBar.style.width = `${t.soc}%`;
+            dom.socBar.className = p.soc > 85 ? 'bar-fill bar-blue' : 'bar-fill bar-green';
+        }
+        if (dom.voltageVal) dom.voltageVal.textContent = `${t.terminalVoltage} V`;
+        if (dom.currentVal) dom.currentVal.textContent = `${t.batteryCurrent} A`;
+        if (dom.batteryTempVal) dom.batteryTempVal.textContent = `${Math.round(p.batteryTemp)}°C`;
+
+        // Motor & Inverter
+        if (dom.motorRpmVal) dom.motorRpmVal.textContent = `${t.motorRpm} RPM`;
+        if (dom.backEmfVal) dom.backEmfVal.textContent = `${t.backEmf} V`;
+        if (dom.motorTempVal) dom.motorTempVal.textContent = `${t.motorTemp}°C`;
+        if (dom.inverterTempVal) dom.inverterTempVal.textContent = `${t.inverterTemp}°C`;
+
+        // Brakes & Temperature
+        if (dom.discTempVal) {
+            dom.discTempVal.textContent = `${t.frontDiscTemp}°C`;
+            if (t.frontDiscTemp > 250) {
+                dom.discTempVal.className = 'telemetry-val text-red glow-red';
+            } else {
+                dom.discTempVal.className = 'telemetry-val';
+            }
+        }
+
+        // Energy Recovery Benchmark Metrics
+        if (dom.energyRecoveredWh) dom.energyRecoveredWh.textContent = `${t.totalEnergyRecoveredWh} Wh`;
+        if (dom.energyEfficiency) dom.energyEfficiency.textContent = `${t.eventEfficiency}%`;
+        if (dom.stoppingDist) dom.stoppingDist.textContent = `${t.eventStoppingDistance} m`;
+        if (dom.stoppingTime) dom.stoppingTime.textContent = `${t.eventStoppingTime} s`;
+
+        // Safety & Protection Badges
+        if (dom.absBadge) dom.absBadge.style.display = t.absEngaged ? 'inline-block' : 'none';
+        if (dom.taperBadge) dom.taperBadge.style.display = p.soc > 80 ? 'inline-block' : 'none';
+        if (dom.invFaultBadge) {
+            if (p.inverterFault) {
+                dom.invFaultBadge.textContent = 'INV SHUTDOWN';
+                dom.invFaultBadge.style.display = 'inline-block';
+            } else if (p.inverterOverheat || p.inverterTemp > 75) {
+                dom.invFaultBadge.textContent = 'INV OVERHEAT';
+                dom.invFaultBadge.style.display = 'inline-block';
+            } else {
+                dom.invFaultBadge.style.display = 'none';
+            }
+        }
+    }
+
+    // Start Animation Loop
+    requestAnimationFrame(animate);
+});
+
+    </script>
 </body>
 </html>
